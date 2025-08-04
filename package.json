@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "build": "echo 'Building bot and Mini App...' && cd mini-app && npm install --legacy-peer-deps && npm run build && echo 'Mini App built successfully' || echo 'Mini App build failed, continuing with fallback'",
+    "build": "echo 'Building bot and Mini App...' && cd mini-app && npm install --legacy-peer-deps && npm run build && cd .. && echo 'Build completed'",
     "postinstall": "npm run build",
     "test": "echo 'No tests configured'"
   },
