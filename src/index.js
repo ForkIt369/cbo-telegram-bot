@@ -127,14 +127,20 @@ app.post('/api/chat/clear', async (req, res) => {
 const miniAppPath = path.join(__dirname, '../mini-app/dist');
 const fs = require('fs');
 
+// In production, serve the built Mini App if it exists
 if (fs.existsSync(miniAppPath)) {
   app.use(express.static(miniAppPath));
   
-  // Fallback to index.html for client-side routing
-  app.get('*', (req, res) => {
+  // Catch all route for client-side routing - must be last
+  app.get('*', (req, res, next) => {
+    // Skip API routes
+    if (req.path.startsWith('/api/') || req.path.startsWith('/telegram-webhook')) {
+      return next();
+    }
     res.sendFile(path.join(miniAppPath, 'index.html'));
   });
 } else {
+  // Development fallback
   app.get('/', (req, res) => {
     res.send(`
       <html>
