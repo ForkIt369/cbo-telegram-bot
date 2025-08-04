@@ -1,0 +1,8 @@
+{
+  "timestamp": "2025-08-04T13:45:46.848Z",
+  "type": "test",
+  "flow": "cash",
+  "content": "Test insight",
+  "userId": "test123",
+  "confidence": 0.9
+}

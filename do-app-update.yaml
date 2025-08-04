@@ -1,0 +1,166 @@
+name: cbo-mcp-system
+region: nyc
+services:
+- name: cbo-mcp
+  github:
+    repo: ForkIt369/cbo-mcp-system
+    branch: main
+    deploy_on_push: true
+  build_command: npm ci && npm run build
+  run_command: node dist/cbo-mcp/index.js
+  source_dir: /
+  environment_slug: node-js
+  instance_size_slug: apps-s-1vcpu-1gb
+  instance_count: 1
+  health_check:
+    http_path: /health
+  internal_ports:
+  - 3000
+  envs:
+  - key: NODE_ENV
+    value: production
+    scope: RUN_AND_BUILD_TIME
+  - key: PORT
+    value: "3000"
+    scope: RUN_AND_BUILD_TIME
+  - key: SERVICE_NAME
+    value: cbo-mcp
+    scope: RUN_AND_BUILD_TIME
+
+- name: memory-mcp
+  github:
+    repo: ForkIt369/cbo-mcp-system
+    branch: main
+    deploy_on_push: true
+  build_command: npm ci && npm run build
+  run_command: node dist/memory-mcp/index.js
+  source_dir: /
+  environment_slug: node-js
+  instance_size_slug: apps-s-1vcpu-1gb
+  instance_count: 1
+  health_check:
+    http_path: /health
+  internal_ports:
+  - 3001
+  envs:
+  - key: NODE_ENV
+    value: production
+    scope: RUN_AND_BUILD_TIME
+  - key: PORT
+    value: "3001"
+    scope: RUN_AND_BUILD_TIME
+  - key: SERVICE_NAME
+    value: memory-mcp
+    scope: RUN_AND_BUILD_TIME
+  - key: DATABASE_URL
+    value: "EV[1:Yq+zoFBfLAdWZAB2PZ5bK0cVQe/98AyL:Lpn+zXVMwcx5dLS1dEfqQQ==]"
+    scope: RUN_TIME
+    type: SECRET
+  - key: VOYAGE_API_KEY
+    value: "EV[1:NkNZc8yjTxAd7lKzia4BjkesHX6D0Efj:DmYz4+uYAiPpvYFn7W9bqQ==]"
+    scope: RUN_TIME
+    type: SECRET
+  - key: SUPABASE_URL
+    value: "EV[1:q8SihPNuo0z6PCxpmiZIVcSJDCkTufFP:XjOHgeMXUZepr3GTCdIBRQ==]"
+    scope: RUN_TIME
+    type: SECRET
+  - key: SUPABASE_SERVICE_KEY
+    value: "EV[1:e9qTW2KZQ4KospSzGkSObm6zlczY1OnK:gSAlFjmTHj+EYgw49mqoSA==]"
+    scope: RUN_TIME
+    type: SECRET
+
+- name: knowledge-mcp
+  github:
+    repo: ForkIt369/cbo-mcp-system
+    branch: main
+    deploy_on_push: true
+  build_command: npm ci && npm run build
+  run_command: node dist/knowledge-mcp/index.js
+  source_dir: /
+  environment_slug: node-js
+  instance_size_slug: apps-s-1vcpu-1gb
+  instance_count: 1
+  health_check:
+    http_path: /health
+  internal_ports:
+  - 3002
+  envs:
+  - key: NODE_ENV
+    value: production
+    scope: RUN_AND_BUILD_TIME
+  - key: PORT
+    value: "3002"
+    scope: RUN_AND_BUILD_TIME
+  - key: SERVICE_NAME
+    value: knowledge-mcp
+    scope: RUN_AND_BUILD_TIME
+  - key: DATABASE_URL
+    value: "EV[1:mH+dU7P8d1tFiW9rTVsrTOrHrHA2bz4y:Qgfsh0ttUzc+JtDeu6GLRg==]"
+    scope: RUN_TIME
+    type: SECRET
+  - key: VOYAGE_API_KEY
+    value: "EV[1:3OYrl3BgWGQTWre9b/ca4H3BeO+U/5mV:4jZej6aoq9TjriSeNDhHHA==]"
+    scope: RUN_TIME
+    type: SECRET
+  - key: SUPABASE_URL
+    value: "EV[1:66RLRNisUVkk5hzvZ2Fbl6m8+cyFaj/Y:5Z2hT3uNsS17hFt8yr12Cw==]"
+    scope: RUN_TIME
+    type: SECRET
+  - key: SUPABASE_SERVICE_KEY
+    value: "EV[1:wNUnttOjVGG3AN0PpU2SwB6QBSChXouO:R9roTsb4s3lehDEWXXjuQg==]"
+    scope: RUN_TIME
+    type: SECRET
+
+workers:
+- name: telegram-bot  # REPLACED WITH YOUR NEW BOT
+  github:
+    repo: digitaldavinci/cbo-telegram-bot  # YOUR REPO
+    branch: main
+    deploy_on_push: true
+  build_command: npm install  # Simpler build
+  run_command: node src/index.js  # Direct run
+  source_dir: /
+  environment_slug: node-js
+  instance_size_slug: apps-s-1vcpu-1gb
+  instance_count: 1
+  envs:
+  - key: NODE_ENV
+    value: production
+    scope: RUN_AND_BUILD_TIME
+  - key: SERVICE_NAME
+    value: telegram-bot
+    scope: RUN_AND_BUILD_TIME
+  - key: TELEGRAM_BOT_TOKEN
+    value: "EV[1:PLACEHOLDER:PLACEHOLDER]"
+    scope: RUN_TIME
+    type: SECRET
+  - key: ANTHROPIC_API_KEY
+    value: "EV[1:PLACEHOLDER:PLACEHOLDER]"
+    scope: RUN_TIME
+    type: SECRET
+  # Keep connections to MCP services
+  - key: CBO_MCP_URL
+    value: http://cbo-mcp:3000
+    scope: RUN_AND_BUILD_TIME
+  - key: MEMORY_MCP_URL
+    value: http://memory-mcp:3001
+    scope: RUN_AND_BUILD_TIME
+  - key: KNOWLEDGE_MCP_URL
+    value: http://knowledge-mcp:3002
+    scope: RUN_AND_BUILD_TIME
+  # Reuse existing database
+  - key: DATABASE_URL
+    value: "EV[1:I4rOL6wTgRxglPw8HasKx0la8eqK58/H:4RMHL+2wTSAWD+lQ9zNRTg==]"
+    scope: RUN_TIME
+    type: SECRET
+  - key: VOYAGE_API_KEY
+    value: "EV[1:+NC2C9KiLmg+bujvRDtbDyape2BZ1KJ3:xrnlBiH32gw6WpP+UBUPZg==]"
+    scope: RUN_TIME
+    type: SECRET
+
+alerts:
+- rule: DEPLOYMENT_FAILED
+- rule: DOMAIN_FAILED
+
+features:
+- buildpack-stack=ubuntu-22
