@@ -3,15 +3,30 @@ const logger = require('../utils/logger');
 
 class ClaudeService {
   constructor() {
-    if (!process.env.ANTHROPIC_API_KEY) {
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
       logger.error('ANTHROPIC_API_KEY is not set in environment variables');
+      this.anthropic = null;
+      return;
     }
-    this.anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY || 'dummy-key',
-    });
+    
+    try {
+      this.anthropic = new Anthropic({
+        apiKey: apiKey,
+      });
+      logger.info('Claude service initialized successfully with API key');
+    } catch (error) {
+      logger.error('Failed to initialize Claude service:', error);
+      this.anthropic = null;
+    }
   }
 
   async processBusinessQuery(query, context = {}) {
+    if (!this.anthropic) {
+      logger.error('Claude service not initialized');
+      return 'I apologize, but I'm experiencing technical difficulties. Please try again later.';
+    }
+    
     try {
       const systemPrompt = `You are CBO-Bro, a Chief Business Optimization AI assistant with a green cube head, glasses, and a business suit. You help businesses optimize through the BroVerse Biz Mental Model™ (BBMM) framework.
 
