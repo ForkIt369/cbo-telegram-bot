@@ -3,8 +3,11 @@ const logger = require('../utils/logger');
 
 class ClaudeService {
   constructor() {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      logger.error('ANTHROPIC_API_KEY is not set in environment variables');
+    }
     this.anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
+      apiKey: process.env.ANTHROPIC_API_KEY || 'dummy-key',
     });
   }
 
