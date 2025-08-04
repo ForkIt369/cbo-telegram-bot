@@ -24,7 +24,7 @@ class ClaudeService {
   async processBusinessQuery(query, context = {}) {
     if (!this.anthropic) {
       logger.error('Claude service not initialized');
-      return 'I apologize, but I'm experiencing technical difficulties. Please try again later.';
+      return 'I apologize, but I am experiencing technical difficulties. Please try again later.';
     }
     
     try {
