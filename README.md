@@ -2,6 +2,13 @@
 
 A Telegram bot interface for the Chief Business Optimization (CBO) agent using the BroVerse Biz Mental Model™ (BBMM).
 
+## 🚀 Status: LIVE IN PRODUCTION
+
+✅ **Bot is running 24/7 on DigitalOcean App Platform**
+- Repository: https://github.com/ForkIt369/cbo-telegram-bot
+- Deployment: Automatic on push to master branch
+- Using: Claude Sonnet 4 (claude-sonnet-4-20250514)
+
 ## Features
 
 - 🤖 Telegram bot interface for business optimization queries
