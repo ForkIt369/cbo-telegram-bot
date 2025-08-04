@@ -68,9 +68,20 @@ bot.on('text', async (ctx) => {
   logger.info(`Received message from ${userId}: ${message}`);
   
   try {
+    // Send immediate typing action
     await ctx.telegram.sendChatAction(ctx.chat.id, 'typing');
     
-    const response = await cboHandler.processMessage(userId, message);
+    // Process message with timeout handling
+    const processWithTimeout = async () => {
+      return Promise.race([
+        cboHandler.processMessage(userId, message),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Processing timeout')), 18000)
+        )
+      ]);
+    };
+    
+    const response = await processWithTimeout();
     
     if (response.length > 4096) {
       const chunks = response.match(/.{1,4096}/g);
@@ -82,7 +93,27 @@ bot.on('text', async (ctx) => {
     }
   } catch (error) {
     logger.error('Error processing message:', error);
-    await ctx.reply('Sorry, I encountered an error processing your request. Please try again.');
+    
+    if (error.message === 'Processing timeout') {
+      await ctx.reply('⏱️ Processing is taking longer than expected. I\'m still working on your request and will respond shortly.');
+      
+      // Continue processing in background and send response when ready
+      cboHandler.processMessage(userId, message)
+        .then(response => {
+          if (response.length > 4096) {
+            const chunks = response.match(/.{1,4096}/g);
+            chunks.forEach(chunk => ctx.reply(chunk));
+          } else {
+            ctx.reply(response);
+          }
+        })
+        .catch(bgError => {
+          logger.error('Background processing error:', bgError);
+          ctx.reply('Sorry, I encountered an error processing your request. Please try again.');
+        });
+    } else {
+      await ctx.reply('Sorry, I encountered an error processing your request. Please try again.');
+    }
   }
 });
 
@@ -91,6 +122,26 @@ const PORT = process.env.PORT || 3003;
 // Express middleware - MUST be first
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Add timeout middleware for webhook requests
+app.use('/telegram-webhook', (req, res, next) => {
+  // Set timeout to 20 seconds (Telegram's limit is ~25 seconds)
+  req.setTimeout(20000, () => {
+    logger.error('Webhook request timeout');
+    if (!res.headersSent) {
+      res.status(408).json({ error: 'Request timeout' });
+    }
+  });
+  
+  res.setTimeout(20000, () => {
+    logger.error('Webhook response timeout');
+    if (!res.headersSent) {
+      res.status(408).json({ error: 'Response timeout' });
+    }
+  });
+  
+  next();
+});
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -136,8 +187,26 @@ app.post('/api/chat/clear', async (req, res) => {
 
 // Webhook setup MUST come before static file serving
 if (process.env.NODE_ENV === 'production') {
+  // Add webhook logging middleware
+  app.use('/telegram-webhook', (req, res, next) => {
+    logger.info('Webhook request received', {
+      method: req.method,
+      headers: req.headers,
+      body: req.body ? JSON.stringify(req.body).substring(0, 200) : 'No body'
+    });
+    next();
+  });
+  
   // Use the bot's webhook callback
   app.use(bot.webhookCallback('/telegram-webhook'));
+  
+  // Add error handling for webhook
+  app.use('/telegram-webhook', (error, req, res, next) => {
+    logger.error('Webhook error:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Webhook processing failed' });
+    }
+  });
 }
 
 // Serve Mini App

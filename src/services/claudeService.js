@@ -51,12 +51,28 @@ Always analyze business challenges through these flows and provide actionable in
         temperature: 0.7,
         system: systemPrompt,
         messages: messages
+      }, {
+        timeout: 15000 // 15 second timeout for Claude API
       });
 
       return response.content[0].text;
     } catch (error) {
-      logger.error('Error calling Claude API:', error);
-      throw new Error('Failed to process business query');
+      logger.error('Error calling Claude API:', {
+        error: error.message,
+        stack: error.stack,
+        status: error.status,
+        type: error.type
+      });
+      
+      if (error.message?.includes('timeout')) {
+        throw new Error('Claude API timeout - response took too long');
+      } else if (error.status === 429) {
+        throw new Error('Claude API rate limit exceeded - please try again later');
+      } else if (error.status >= 500) {
+        throw new Error('Claude API server error - please try again');
+      } else {
+        throw new Error('Failed to process business query');
+      }
     }
   }
 }
