@@ -80,13 +80,16 @@ bot.on('text', async (ctx) => {
 
 const PORT = process.env.PORT || 3003;
 
+// Express middleware - MUST be first
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // Mini App API endpoints
-app.use(express.json());
 
 // Get chat history
 app.get('/api/chat/history/:userId', async (req, res) => {
@@ -122,6 +125,28 @@ app.post('/api/chat/clear', async (req, res) => {
     res.status(500).json({ error: 'Failed to clear chat' });
   }
 });
+
+// Webhook setup MUST come before static file serving
+if (process.env.NODE_ENV === 'production') {
+  // Add logging middleware for webhook
+  app.use('/telegram-webhook', (req, res, next) => {
+    logger.info('Webhook request received:', {
+      method: req.method,
+      path: req.path,
+      headers: req.headers,
+      body: req.body
+    });
+    next();
+  });
+  
+  app.use('/telegram-webhook', bot.webhookCallback('/telegram-webhook'));
+  
+  // Add webhook test endpoint
+  app.post('/webhook-test', (req, res) => {
+    logger.info('Webhook test received:', req.body);
+    res.json({ status: 'ok', received: req.body });
+  });
+}
 
 // Serve Mini App
 const miniAppPath = path.join(__dirname, '../mini-app/dist');
@@ -206,10 +231,6 @@ if (fs.existsSync(miniAppPath)) {
       </html>
     `);
   });
-}
-
-if (process.env.NODE_ENV === 'production') {
-  app.use(bot.webhookCallback('/telegram-webhook'));
 }
 
 app.listen(PORT, async () => {
