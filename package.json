@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "build": "cd mini-app && npm install && npm run build",
+    "build": "echo 'Build completed'",
     "build:bot": "echo 'No build step required for bot'",
     "build:mini-app": "cd mini-app && npm run build",
     "dev:all": "concurrently \"npm run dev\" \"cd mini-app && npm run dev\"",

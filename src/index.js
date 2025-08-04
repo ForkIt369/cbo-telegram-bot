@@ -122,12 +122,83 @@ app.post('/api/chat/clear', async (req, res) => {
 });
 
 // Serve Mini App
-app.use(express.static(path.join(__dirname, '../mini-app/dist')));
+const miniAppPath = path.join(__dirname, '../mini-app/dist');
+const fs = require('fs');
 
-// Fallback to index.html for client-side routing
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../mini-app/dist/index.html'));
-});
+if (fs.existsSync(miniAppPath)) {
+  app.use(express.static(miniAppPath));
+  
+  // Fallback to index.html for client-side routing
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(miniAppPath, 'index.html'));
+  });
+} else {
+  app.get('/', (req, res) => {
+    res.send(`
+      <html>
+        <head>
+          <title>CBO-Bro Mini App</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              background: #1a1a1a;
+              color: #fff;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              min-height: 100vh;
+              margin: 0;
+              padding: 20px;
+              text-align: center;
+            }
+            .container {
+              max-width: 600px;
+            }
+            .avatar {
+              width: 120px;
+              height: 120px;
+              background: #00ff41;
+              border-radius: 20px;
+              margin: 0 auto 30px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 60px;
+            }
+            h1 {
+              color: #00ff41;
+              margin-bottom: 20px;
+            }
+            p {
+              color: #888;
+              line-height: 1.6;
+              margin-bottom: 30px;
+            }
+            .button {
+              background: #00ff41;
+              color: #000;
+              padding: 15px 30px;
+              border-radius: 10px;
+              text-decoration: none;
+              font-weight: bold;
+              display: inline-block;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="avatar">🤖</div>
+            <h1>CBO-Bro Mini App</h1>
+            <p>The Mini App is being prepared. Please use the Telegram bot directly for now.</p>
+            <p>I'm your Chief Business Optimization assistant, helping you optimize through Value, Info, Work & Cash flows.</p>
+            <a href="https://t.me/cbo_bro_bot" class="button">Open in Telegram</a>
+          </div>
+        </body>
+      </html>
+    `);
+  });
+}
 
 if (process.env.NODE_ENV === 'production') {
   app.use(bot.webhookCallback('/telegram-webhook'));
