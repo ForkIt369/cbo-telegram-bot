@@ -1,0 +1,19 @@
+.flow-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 16px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.flow-emoji {
+  font-size: 16px;
+}
+
+.flow-name {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}

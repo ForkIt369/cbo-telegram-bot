@@ -12,9 +12,11 @@ A Telegram bot interface for the Chief Business Optimization (CBO) agent using t
 ## Features
 
 - 🤖 Telegram bot interface for business optimization queries
+- 📱 **NEW: Telegram Mini App** with beautiful chat UI
 - 📊 Four Flows analysis (Value, Info, Work, Cash)
 - 💡 Pattern recognition and recommendations
 - 🚀 Scalable architecture ready for DigitalOcean deployment
+- ✨ Smooth animations and haptic feedback
 
 ## Setup
 
@@ -31,8 +33,17 @@ cp .env.example .env
 
 3. Run locally:
 ```bash
+# Run bot only
 npm run dev
+
+# Run bot + Mini App (recommended)
+npm run dev:all
 ```
+
+4. Set up Mini App in BotFather:
+- Open @BotFather
+- Select your bot → Bot Settings → Menu Button
+- Set URL to your Mini App (use ngrok for testing)
 
 ## Deployment Options
 

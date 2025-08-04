@@ -9,15 +9,17 @@ const app = express();
 const cboHandler = new CBOAgentHandler();
 
 bot.start((ctx) => {
-  ctx.reply(`Welcome! I'm CBO-Bro, your Chief Business Optimization assistant.
+  ctx.reply(`🤖 Welcome! I'm CBO-Bro, your Chief Business Optimization assistant.
 
-I analyze businesses through 4 key flows:
-• VALUE - Customer delivery
-• INFO - Data & decisions  
-• WORK - Operations
-• CASH - Financial health
+I'm that green cube-headed business expert with glasses who helps you optimize through 4 key flows:
+• 💎 VALUE - Customer delivery
+• 📊 INFO - Data & decisions  
+• ⚙️ WORK - Operations
+• 💰 CASH - Financial health
 
-Just tell me your business challenge and I'll provide actionable insights.
+Just tell me your business challenge and I'll provide actionable insights!
+
+💡 Pro tip: Click the menu button for a better chat experience with my Mini App!
 
 Try: "How can I improve customer retention?" or "My cash flow is tight"`);
 });
@@ -74,9 +76,52 @@ bot.on('text', async (ctx) => {
 });
 
 const PORT = process.env.PORT || 3000;
+
+// Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// Mini App API endpoints
+app.use(express.json());
+
+// Get chat history
+app.get('/api/chat/history/:userId', async (req, res) => {
+  try {
+    const messages = cboHandler.getOrCreateContext(req.params.userId).messages;
+    res.json({ messages: messages.slice(-20) });
+  } catch (error) {
+    logger.error('Error fetching chat history:', error);
+    res.status(500).json({ error: 'Failed to fetch history' });
+  }
+});
+
+// Send message
+app.post('/api/chat/message', async (req, res) => {
+  try {
+    const { userId, message } = req.body;
+    const response = await cboHandler.processMessage(userId, message);
+    res.json({ response });
+  } catch (error) {
+    logger.error('Error processing message:', error);
+    res.status(500).json({ error: 'Failed to process message' });
+  }
+});
+
+// Clear chat
+app.post('/api/chat/clear', async (req, res) => {
+  try {
+    const { userId } = req.body;
+    await cboHandler.clearContext(userId);
+    res.json({ success: true });
+  } catch (error) {
+    logger.error('Error clearing chat:', error);
+    res.status(500).json({ error: 'Failed to clear chat' });
+  }
+});
+
+// Serve Mini App
+app.use(express.static('mini-app/dist'));
 
 if (process.env.NODE_ENV === 'production') {
   app.use(bot.webhookCallback('/telegram-webhook'));
