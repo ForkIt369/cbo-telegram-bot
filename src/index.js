@@ -7,6 +7,12 @@ const path = require('path');
 const logger = require('./utils/logger');
 const CBOAgentHandler = require('./handlers/cboAgentHandler');
 
+// Validate required environment variables
+if (!process.env.TELEGRAM_BOT_TOKEN) {
+  logger.error('TELEGRAM_BOT_TOKEN is not set!');
+  process.exit(1);
+}
+
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 const app = express();
 const cboHandler = new CBOAgentHandler();
@@ -59,8 +65,10 @@ bot.on('text', async (ctx) => {
   const userId = ctx.from.id;
   const message = ctx.message.text;
   
+  logger.info(`Received message from ${userId}: ${message}`);
+  
   try {
-    ctx.telegram.sendChatAction(ctx.chat.id, 'typing');
+    await ctx.telegram.sendChatAction(ctx.chat.id, 'typing');
     
     const response = await cboHandler.processMessage(userId, message);
     
@@ -74,7 +82,7 @@ bot.on('text', async (ctx) => {
     }
   } catch (error) {
     logger.error('Error processing message:', error);
-    ctx.reply('Sorry, I encountered an error processing your request. Please try again.');
+    await ctx.reply('Sorry, I encountered an error processing your request. Please try again.');
   }
 });
 
@@ -128,24 +136,8 @@ app.post('/api/chat/clear', async (req, res) => {
 
 // Webhook setup MUST come before static file serving
 if (process.env.NODE_ENV === 'production') {
-  // Add logging middleware for webhook
-  app.use('/telegram-webhook', (req, res, next) => {
-    logger.info('Webhook request received:', {
-      method: req.method,
-      path: req.path,
-      headers: req.headers,
-      body: req.body
-    });
-    next();
-  });
-  
-  app.use('/telegram-webhook', bot.webhookCallback('/telegram-webhook'));
-  
-  // Add webhook test endpoint
-  app.post('/webhook-test', (req, res) => {
-    logger.info('Webhook test received:', req.body);
-    res.json({ status: 'ok', received: req.body });
-  });
+  // Use the bot's webhook callback
+  app.use(bot.webhookCallback('/telegram-webhook'));
 }
 
 // Serve Mini App
