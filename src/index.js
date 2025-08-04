@@ -1,4 +1,6 @@
-require('dotenv').config();
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 const { Telegraf } = require('telegraf');
 const express = require('express');
 const path = require('path');
@@ -76,7 +78,7 @@ bot.on('text', async (ctx) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3003;
 
 // Health check endpoint
 app.get('/health', (req, res) => {

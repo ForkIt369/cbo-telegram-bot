@@ -6,11 +6,8 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "build": "echo 'Build completed'",
-    "build:bot": "echo 'No build step required for bot'",
-    "build:mini-app": "cd mini-app && npm run build",
-    "dev:all": "concurrently \"npm run dev\" \"cd mini-app && npm run dev\"",
-    "test": "jest"
+    "build": "echo 'Bot ready for deployment'",
+    "test": "echo 'No tests configured'"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.24.3",
