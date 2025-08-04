@@ -55,7 +55,7 @@ const ChatInterface = ({ userId }) => {
     <div className="chat-interface">
       <header className="chat-header">
         <Avatar 
-          src="/cbo-avatar.png" 
+          src="/cbo-avatar.svg" 
           size={40}
           alt="CBO-Bro - Business Optimization Expert"
           fallbackIcon={
@@ -81,7 +81,7 @@ const ChatInterface = ({ userId }) => {
               <div className="welcome-avatar">
                 <Avatar 
                   size={80}
-                  src="/cbo-avatar.png"
+                  src="/cbo-avatar.svg"
                   fallbackIcon={
                     <span style={{ fontSize: '40px' }}>💼</span>
                   }
