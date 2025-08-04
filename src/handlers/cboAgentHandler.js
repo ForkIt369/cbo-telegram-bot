@@ -1,44 +1,10 @@
 const logger = require('../utils/logger');
 const memoryBank = require('../memory/memoryBank');
+const claudeService = require('../services/claudeService');
 
 class CBOAgentHandler {
   constructor() {
     this.conversations = new Map();
-    this.loadCBOAgent();
-  }
-
-  loadCBOAgent() {
-    try {
-      const path = require('path');
-      const agentPath = path.resolve(__dirname, '../../agents/cbo-agent.js');
-      this.cboAgent = require(agentPath);
-      logger.info('CBO Agent loaded successfully');
-    } catch (error) {
-      logger.warn('CBO Agent not found, using mock agent');
-      this.cboAgent = this.createMockAgent();
-    }
-  }
-
-  createMockAgent() {
-    return {
-      processQuery: async (query, context) => {
-        return `[CBO Agent Mock Response]
-        
-Query received: "${query}"
-
-This is a placeholder response. Once the actual CBO agent is implemented in /agents, I'll provide real business optimization insights using the BroVerse Biz Mental Model™ (BBMM).
-
-For now, I can tell you that your query would be analyzed across:
-- Four Flows (Value, Info, Work, Cash)
-- 12 Capabilities
-- 64 Business Patterns
-
-Please implement the CBO agent to get actual insights!`;
-      },
-      clearContext: async (userId) => {
-        logger.info(`Context cleared for user ${userId}`);
-      }
-    };
   }
 
   async processMessage(userId, message) {
@@ -46,7 +12,7 @@ Please implement the CBO agent to get actual insights!`;
     context.messages.push({ role: 'user', content: message, timestamp: new Date() });
     
     try {
-      const response = await this.cboAgent.processQuery(message, context);
+      const response = await claudeService.processBusinessQuery(message, context);
       
       context.messages.push({ role: 'assistant', content: response, timestamp: new Date() });
       
@@ -104,9 +70,6 @@ Please implement the CBO agent to get actual insights!`;
 
   async clearContext(userId) {
     this.conversations.delete(userId);
-    if (this.cboAgent.clearContext) {
-      await this.cboAgent.clearContext(userId);
-    }
   }
 }
 
