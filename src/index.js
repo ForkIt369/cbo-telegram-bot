@@ -1,6 +1,7 @@
 require('dotenv').config();
 const { Telegraf } = require('telegraf');
 const express = require('express');
+const path = require('path');
 const logger = require('./utils/logger');
 const CBOAgentHandler = require('./handlers/cboAgentHandler');
 
@@ -121,7 +122,12 @@ app.post('/api/chat/clear', async (req, res) => {
 });
 
 // Serve Mini App
-app.use(express.static('mini-app/dist'));
+app.use(express.static(path.join(__dirname, '../mini-app/dist')));
+
+// Fallback to index.html for client-side routing
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../mini-app/dist/index.html'));
+});
 
 if (process.env.NODE_ENV === 'production') {
   app.use(bot.webhookCallback('/telegram-webhook'));
