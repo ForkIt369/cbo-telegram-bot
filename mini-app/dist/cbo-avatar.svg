@@ -1,0 +1,52 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="#1a1a1a"/>
+  
+  <!-- Green cube head -->
+  <g transform="translate(100, 90)">
+    <!-- Cube faces -->
+    <path d="M -40 -30 L -40 30 L 0 50 L 0 -10 Z" fill="#00ff41" stroke="#00cc33" stroke-width="2"/>
+    <path d="M -40 -30 L 0 -50 L 40 -30 L 0 -10 Z" fill="#33ff66" stroke="#00cc33" stroke-width="2"/>
+    <path d="M 0 -10 L 40 -30 L 40 30 L 0 50 Z" fill="#00dd38" stroke="#00cc33" stroke-width="2"/>
+    
+    <!-- Glasses -->
+    <g transform="translate(0, 5)">
+      <!-- Left lens -->
+      <rect x="-30" y="-5" width="20" height="15" rx="3" fill="none" stroke="#333" stroke-width="3"/>
+      <rect x="-28" y="-3" width="16" height="11" rx="2" fill="#4a9eff" opacity="0.3"/>
+      
+      <!-- Right lens -->
+      <rect x="10" y="-5" width="20" height="15" rx="3" fill="none" stroke="#333" stroke-width="3"/>
+      <rect x="12" y="-3" width="16" height="11" rx="2" fill="#4a9eff" opacity="0.3"/>
+      
+      <!-- Bridge -->
+      <path d="M -10 2 L 10 2" stroke="#333" stroke-width="3"/>
+      
+      <!-- Temples -->
+      <path d="M -30 2 L -45 0" stroke="#333" stroke-width="3"/>
+      <path d="M 30 2 L 45 0" stroke="#333" stroke-width="3"/>
+    </g>
+    
+    <!-- Eyes behind glasses -->
+    <circle cx="-20" cy="5" r="3" fill="#000"/>
+    <circle cx="20" cy="5" r="3" fill="#000"/>
+    
+    <!-- Smile -->
+    <path d="M -15 20 Q 0 30 15 20" stroke="#000" stroke-width="2" fill="none"/>
+  </g>
+  
+  <!-- Business suit collar -->
+  <path d="M 60 140 L 60 180 L 80 180 L 100 160 L 120 180 L 140 180 L 140 140" 
+        fill="#2c3e50" stroke="#1a252f" stroke-width="2"/>
+  
+  <!-- Tie -->
+  <path d="M 100 140 L 95 180 L 100 185 L 105 180 L 100 140" 
+        fill="#e74c3c" stroke="#c0392b" stroke-width="1"/>
+  
+  <!-- Tie knot -->
+  <path d="M 92 140 L 100 150 L 108 140 L 100 135 Z" 
+        fill="#c0392b"/>
+  
+  <!-- Title text -->
+  <text x="100" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#00ff41">CBO-BRO</text>
+</svg>
