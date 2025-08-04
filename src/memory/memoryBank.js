@@ -8,21 +8,25 @@ class MemoryBank {
     this.conversationsPath = path.join(this.memoryPath, 'conversations');
     this.insightsPath = path.join(this.memoryPath, 'insights');
     this.patternsPath = path.join(this.memoryPath, 'patterns');
-    this.initializeDirectories();
+    this.initialized = false;
   }
 
   async initializeDirectories() {
+    if (this.initialized) return;
+    
     const dirs = [this.memoryPath, this.conversationsPath, this.insightsPath, this.patternsPath];
     for (const dir of dirs) {
       try {
         await fs.mkdir(dir, { recursive: true });
       } catch (error) {
-        logger.error(`Error creating directory ${dir}:`, error);
+        logger.warn(`Could not create directory ${dir}:`, error.message);
       }
     }
+    this.initialized = true;
   }
 
   async saveConversation(userId, conversation) {
+    await this.initializeDirectories();
     const filename = `${userId}_${Date.now()}.json`;
     const filepath = path.join(this.conversationsPath, filename);
     
@@ -39,11 +43,12 @@ class MemoryBank {
       
       logger.info(`Conversation saved for user ${userId}`);
     } catch (error) {
-      logger.error('Error saving conversation:', error);
+      logger.warn('Could not save conversation to disk:', error.message);
     }
   }
 
   async saveInsight(insight) {
+    await this.initializeDirectories();
     const filename = `insight_${Date.now()}.json`;
     const filepath = path.join(this.insightsPath, filename);
     
@@ -59,11 +64,12 @@ class MemoryBank {
       
       logger.info(`Insight saved: ${insight.type}`);
     } catch (error) {
-      logger.error('Error saving insight:', error);
+      logger.warn('Could not save insight to disk:', error.message);
     }
   }
 
   async savePattern(pattern) {
+    await this.initializeDirectories();
     const filename = `pattern_${pattern.type}_${Date.now()}.json`;
     const filepath = path.join(this.patternsPath, filename);
     
@@ -79,12 +85,13 @@ class MemoryBank {
       
       logger.info(`Pattern saved: ${pattern.type}`);
     } catch (error) {
-      logger.error('Error saving pattern:', error);
+      logger.warn('Could not save pattern to disk:', error.message);
     }
   }
 
   async getRecentInsights(limit = 10) {
     try {
+      await this.initializeDirectories();
       const files = await fs.readdir(this.insightsPath);
       const insights = [];
       
@@ -95,13 +102,14 @@ class MemoryBank {
       
       return insights.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     } catch (error) {
-      logger.error('Error getting insights:', error);
+      logger.warn('Could not read insights:', error.message);
       return [];
     }
   }
 
   async getPatternsByType(type) {
     try {
+      await this.initializeDirectories();
       const files = await fs.readdir(this.patternsPath);
       const patterns = [];
       
@@ -114,13 +122,14 @@ class MemoryBank {
       
       return patterns;
     } catch (error) {
-      logger.error('Error getting patterns:', error);
+      logger.warn('Could not read patterns:', error.message);
       return [];
     }
   }
 
   async getUserHistory(userId, limit = 5) {
     try {
+      await this.initializeDirectories();
       const files = await fs.readdir(this.conversationsPath);
       const userFiles = files.filter(f => f.startsWith(`${userId}_`));
       const conversations = [];
@@ -132,7 +141,7 @@ class MemoryBank {
       
       return conversations.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     } catch (error) {
-      logger.error('Error getting user history:', error);
+      logger.warn('Could not read user history:', error.message);
       return [];
     }
   }

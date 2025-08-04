@@ -204,14 +204,22 @@ if (fs.existsSync(miniAppPath)) {
 
 if (process.env.NODE_ENV === 'production') {
   app.use(bot.webhookCallback('/telegram-webhook'));
-  bot.telegram.setWebhook(`${process.env.WEBHOOK_URL}/telegram-webhook`);
-} else {
-  bot.launch();
-  logger.info('Bot started in polling mode');
 }
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   logger.info(`Server running on port ${PORT}`);
+  
+  if (process.env.NODE_ENV === 'production') {
+    try {
+      await bot.telegram.setWebhook(`${process.env.WEBHOOK_URL}/telegram-webhook`);
+      logger.info('Webhook set successfully');
+    } catch (error) {
+      logger.error('Failed to set webhook:', error);
+    }
+  } else {
+    bot.launch();
+    logger.info('Bot started in polling mode');
+  }
 });
 
 process.once('SIGINT', () => bot.stop('SIGINT'));
