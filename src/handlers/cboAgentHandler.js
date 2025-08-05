@@ -1,10 +1,18 @@
 const logger = require('../utils/logger');
 const memoryBank = require('../memory/memoryBank');
 const claudeService = require('../services/claudeService');
+const claudeServiceWithTools = require('../services/claudeServiceWithTools');
 
 class CBOAgentHandler {
   constructor() {
     this.conversations = new Map();
+    this.useTools = process.env.ENABLE_MCP_TOOLS === 'true';
+    
+    if (this.useTools) {
+      logger.info('CBOAgentHandler initialized with MCP tools support');
+    } else {
+      logger.info('CBOAgentHandler initialized without MCP tools');
+    }
   }
 
   async processMessage(userId, message) {
@@ -12,7 +20,9 @@ class CBOAgentHandler {
     context.messages.push({ role: 'user', content: message, timestamp: new Date() });
     
     try {
-      const response = await claudeService.processBusinessQuery(message, context);
+      // Use appropriate service based on configuration
+      const service = this.useTools ? claudeServiceWithTools : claudeService;
+      const response = await service.processBusinessQuery(message, context);
       
       context.messages.push({ role: 'assistant', content: response, timestamp: new Date() });
       

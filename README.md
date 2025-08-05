@@ -17,6 +17,7 @@ A Telegram bot interface for the Chief Business Optimization (CBO) agent using t
 - 💡 Pattern recognition and recommendations
 - 🚀 Scalable architecture ready for DigitalOcean deployment
 - ✨ Smooth animations and haptic feedback
+- 🔒 **Whitelist access control** for secure user management
 
 ## Setup
 
@@ -89,6 +90,11 @@ docker run -d \
 - `/status` - Check bot status
 - `/clear` - Clear conversation context
 
+### Admin Commands
+- `/whitelist` - View all whitelisted users
+- `/adduser <user_id> [notes]` - Add user to whitelist
+- `/removeuser <user_id>` - Remove user from whitelist
+
 ## Architecture
 
 ```
@@ -110,6 +116,28 @@ agents/
 - `NODE_ENV` - Environment (development/production)
 - `WEBHOOK_URL` - Full webhook URL (production only)
 - `CBO_AGENT_PATH` - Path to CBO agent module
+- `ANTHROPIC_API_KEY` - Claude API key for AI responses
+
+## Whitelist Configuration
+
+The bot uses a whitelist system to control access. Authorized users are managed in `config/whitelist.json`:
+
+```json
+{
+  "users": [
+    {
+      "id": 359511525,
+      "username": "W3_DV",
+      "first_name": "*W!ll💠🪵",
+      "added_date": "2025-08-05",
+      "notes": "Main admin user"
+    }
+  ],
+  "admins": [359511525]
+}
+```
+
+Only admin users can manage the whitelist using bot commands.
 
 ## Next Steps
 

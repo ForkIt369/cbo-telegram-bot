@@ -49,6 +49,7 @@ bot.help(checkWhitelist, (ctx) => {
 /help - This help menu
 /status - Bot status
 /clear - Reset conversation
+/tools - Show available MCP tools
 
 Example questions:
 • "How do I scale my SaaS business?"
@@ -121,6 +122,33 @@ bot.command('removeuser', checkAdmin, async (ctx) => {
   
   const result = await whitelistService.removeUser(userId);
   ctx.reply(result.success ? '✅ ' + result.message : '❌ ' + result.message);
+});
+
+bot.command('tools', checkWhitelist, async (ctx) => {
+  try {
+    if (process.env.ENABLE_MCP_TOOLS !== 'true') {
+      return ctx.reply('🔧 MCP tools are not enabled.\n\nTo enable tools, set ENABLE_MCP_TOOLS=true in environment variables.');
+    }
+    
+    const mcpManager = require('./services/mcpManager');
+    await mcpManager.initialize();
+    
+    const tools = mcpManager.listTools();
+    
+    if (tools.length === 0) {
+      return ctx.reply('🔧 No MCP tools available.\n\nMCP servers may not be connected.');
+    }
+    
+    let message = '🔧 Available MCP Tools:\n\n';
+    for (const tool of tools) {
+      message += `• ${tool.name} (${tool.server})\n  ${tool.description}\n\n`;
+    }
+    
+    ctx.reply(message);
+  } catch (error) {
+    logger.error('Error listing tools:', error);
+    ctx.reply('❌ Failed to list available tools.');
+  }
 });
 
 bot.on('text', checkWhitelist, async (ctx) => {
