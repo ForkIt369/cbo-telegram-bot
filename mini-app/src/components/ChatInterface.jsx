@@ -16,6 +16,8 @@ import './ChatInterface.css';
 
 const ChatInterface = ({ userId }) => {
   const [inputMessage, setInputMessage] = useState('');
+  const [authorized, setAuthorized] = useState(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   
@@ -26,6 +28,33 @@ const ChatInterface = ({ userId }) => {
     sendMessage,
     clearChat
   } = useChat(userId);
+
+  // Check authorization
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId })
+        });
+        const data = await response.json();
+        setAuthorized(data.authorized);
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        setAuthorized(false);
+      } finally {
+        setCheckingAuth(false);
+      }
+    };
+    
+    if (userId) {
+      checkAuth();
+    } else {
+      setCheckingAuth(false);
+      setAuthorized(false);
+    }
+  }, [userId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -50,6 +79,33 @@ const ChatInterface = ({ userId }) => {
       handleSend();
     }
   };
+
+  // Show loading while checking auth
+  if (checkingAuth) {
+    return (
+      <div className="chat-interface auth-check">
+        <div className="auth-loading">
+          <Spinner size="l" />
+          <Text>Verifying access...</Text>
+        </div>
+      </div>
+    );
+  }
+
+  // Show access denied if not authorized
+  if (!authorized) {
+    return (
+      <div className="chat-interface access-denied">
+        <div className="denied-content">
+          <div className="denied-icon">🔒</div>
+          <Text weight="2">Access Restricted</Text>
+          <Caption>This Mini App is for authorized users only.</Caption>
+          <Caption>Your User ID: {userId || 'Not detected'}</Caption>
+          <Caption>Please contact the administrator for access.</Caption>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="chat-interface">

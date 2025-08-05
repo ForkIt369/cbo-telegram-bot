@@ -6,6 +6,8 @@ const express = require('express');
 const path = require('path');
 const logger = require('./utils/logger');
 const CBOAgentHandler = require('./handlers/cboAgentHandler');
+const { checkWhitelist, checkApiAccess, checkAdmin } = require('./middleware/accessControl');
+const whitelistService = require('./services/whitelistService');
 
 // Validate required environment variables
 if (!process.env.TELEGRAM_BOT_TOKEN) {
@@ -17,7 +19,14 @@ const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 const app = express();
 const cboHandler = new CBOAgentHandler();
 
+// Public commands (no whitelist check)
 bot.start((ctx) => {
+  const userId = ctx.from?.id;
+  
+  if (!whitelistService.isWhitelisted(userId)) {
+    return ctx.reply('🔒 Access Restricted\n\nThis bot is for authorized users only.\n\nYour user ID: ' + userId + '\n\nPlease contact the administrator to request access.');
+  }
+  
   ctx.reply(`🤖 Welcome! I'm CBO-Bro, your Chief Business Optimization assistant.
 
 I'm that green cube-headed business expert with glasses who helps you optimize through 4 key flows:
@@ -33,7 +42,8 @@ Just tell me your business challenge and I'll provide actionable insights!
 Try: "How can I improve customer retention?" or "My cash flow is tight"`);
 });
 
-bot.help((ctx) => {
+// Apply whitelist middleware to protected commands
+bot.help(checkWhitelist, (ctx) => {
   ctx.reply(`Commands:
 /start - Welcome message
 /help - This help menu
@@ -49,19 +59,71 @@ Example questions:
 I'll analyze through Value, Info, Work & Cash flows.`);
 });
 
-bot.command('status', (ctx) => {
+bot.command('status', checkWhitelist, (ctx) => {
   ctx.reply(`Bot Status: ✅ Online
 Agent: CBO-Bro
 Version: 1.0.0
 Uptime: ${process.uptime()}s`);
 });
 
-bot.command('clear', async (ctx) => {
+bot.command('clear', checkWhitelist, async (ctx) => {
   await cboHandler.clearContext(ctx.from.id);
   ctx.reply('Conversation context cleared. Fresh start! 🔄');
 });
 
-bot.on('text', async (ctx) => {
+// Admin commands
+bot.command('whitelist', checkAdmin, async (ctx) => {
+  const users = whitelistService.getWhitelistedUsers();
+  const admins = whitelistService.getAdmins();
+  
+  let message = '👥 Whitelisted Users:\n\n';
+  users.forEach(user => {
+    const isAdmin = admins.includes(user.id);
+    message += `${isAdmin ? '👑' : '👤'} ${user.first_name} (@${user.username})\n`;
+    message += `   ID: ${user.id}\n`;
+    message += `   Added: ${user.added_date}\n\n`;
+  });
+  
+  ctx.reply(message);
+});
+
+bot.command('adduser', checkAdmin, async (ctx) => {
+  const args = ctx.message.text.split(' ').slice(1);
+  if (args.length === 0) {
+    return ctx.reply('Usage: /adduser <user_id> [notes]\n\nExample: /adduser 123456789 New team member');
+  }
+  
+  const userId = parseInt(args[0]);
+  const notes = args.slice(1).join(' ');
+  
+  if (isNaN(userId)) {
+    return ctx.reply('Invalid user ID. Must be a number.');
+  }
+  
+  const result = await whitelistService.addUser({
+    id: userId,
+    notes: notes
+  });
+  
+  ctx.reply(result.success ? '✅ ' + result.message : '❌ ' + result.message);
+});
+
+bot.command('removeuser', checkAdmin, async (ctx) => {
+  const args = ctx.message.text.split(' ').slice(1);
+  if (args.length === 0) {
+    return ctx.reply('Usage: /removeuser <user_id>');
+  }
+  
+  const userId = parseInt(args[0]);
+  if (isNaN(userId)) {
+    return ctx.reply('Invalid user ID. Must be a number.');
+  }
+  
+  const result = await whitelistService.removeUser(userId);
+  ctx.reply(result.success ? '✅ ' + result.message : '❌ ' + result.message);
+});
+
+bot.on('text', checkWhitelist, async (ctx) => {
   const userId = ctx.from.id;
   const message = ctx.message.text;
   
@@ -151,7 +213,7 @@ app.get('/health', (req, res) => {
 // Mini App API endpoints
 
 // Get chat history
-app.get('/api/chat/history/:userId', async (req, res) => {
+app.get('/api/chat/history/:userId', checkApiAccess, async (req, res) => {
   try {
     const messages = cboHandler.getOrCreateContext(req.params.userId).messages;
     res.json({ messages: messages.slice(-20) });
@@ -162,7 +224,7 @@ app.get('/api/chat/history/:userId', async (req, res) => {
 });
 
 // Send message
-app.post('/api/chat/message', async (req, res) => {
+app.post('/api/chat/message', checkApiAccess, async (req, res) => {
   try {
     const { userId, message } = req.body;
     const response = await cboHandler.processMessage(userId, message);
@@ -174,7 +236,7 @@ app.post('/api/chat/message', async (req, res) => {
 });
 
 // Clear chat
-app.post('/api/chat/clear', async (req, res) => {
+app.post('/api/chat/clear', checkApiAccess, async (req, res) => {
   try {
     const { userId } = req.body;
     await cboHandler.clearContext(userId);
@@ -182,6 +244,21 @@ app.post('/api/chat/clear', async (req, res) => {
   } catch (error) {
     logger.error('Error clearing chat:', error);
     res.status(500).json({ error: 'Failed to clear chat' });
+  }
+});
+
+// Check access endpoint for Mini App
+app.post('/api/auth/check', async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const isWhitelisted = whitelistService.isWhitelisted(parseInt(userId));
+    res.json({ 
+      authorized: isWhitelisted,
+      isAdmin: whitelistService.isAdmin(parseInt(userId))
+    });
+  } catch (error) {
+    logger.error('Error checking access:', error);
+    res.status(500).json({ error: 'Failed to check access' });
   }
 });
 

@@ -1,0 +1,12 @@
+{
+  "users": [
+    {
+      "id": 359511525,
+      "username": "W3_DV",
+      "first_name": "*W!ll💠🪵",
+      "added_date": "2025-08-05",
+      "notes": "Main admin user"
+    }
+  ],
+  "admins": [359511525]
+}
