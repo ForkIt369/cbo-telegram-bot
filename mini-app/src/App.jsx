@@ -8,7 +8,7 @@ function App() {
 
   return (
     <AppRoot
-      appearance="light"
+      appearance="dark"
       platform="ios"
     >
       <ChatInterface userId={userId} />
