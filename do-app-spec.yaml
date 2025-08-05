@@ -1,9 +1,9 @@
 # DigitalOcean App Platform Specification
-# This is the current live configuration for the telegram-bot worker
+# Configuration for telegram-bot as a service to serve Mini App
 
 name: cbo-mcp-system
 region: nyc
-workers:
+services:
 - name: telegram-bot
   github:
     repo: ForkIt369/cbo-telegram-bot
@@ -15,12 +15,21 @@ workers:
   environment_slug: node-js
   instance_size_slug: apps-s-1vcpu-1gb
   instance_count: 1
+  http_port: 3003
+  health_check:
+    http_path: /health
   envs:
   - key: NODE_ENV
     value: production
     scope: RUN_AND_BUILD_TIME
+  - key: PORT
+    value: "3003"
+    scope: RUN_AND_BUILD_TIME
   - key: SERVICE_NAME
     value: telegram-bot
+    scope: RUN_AND_BUILD_TIME
+  - key: WEBHOOK_URL
+    value: https://cbo-mcp-system-hs2sx.ondigitalocean.app
     scope: RUN_AND_BUILD_TIME
   - key: TELEGRAM_BOT_TOKEN
     scope: RUN_TIME

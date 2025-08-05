@@ -301,8 +301,20 @@ app.listen(PORT, async () => {
     try {
       await bot.telegram.setWebhook(`${process.env.WEBHOOK_URL}/telegram-webhook`);
       logger.info('Webhook set successfully');
+      
+      // Set Mini App in bot menu
+      await bot.telegram.setChatMenuButton({
+        menu_button: {
+          type: 'web_app',
+          text: 'Open CBO-Bro',
+          web_app: {
+            url: process.env.WEBHOOK_URL
+          }
+        }
+      });
+      logger.info('Mini App menu button set successfully');
     } catch (error) {
-      logger.error('Failed to set webhook:', error);
+      logger.error('Failed to set webhook or menu button:', error);
     }
   } else {
     bot.launch();
