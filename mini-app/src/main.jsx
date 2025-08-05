@@ -8,6 +8,11 @@ import App from './App';
 // Initialize Telegram SDK
 try {
   init();
+  // Inform Telegram that the Mini App is ready
+  if (window.Telegram?.WebApp) {
+    window.Telegram.WebApp.ready();
+    window.Telegram.WebApp.expand();
+  }
 } catch (error) {
   console.error('Failed to initialize Telegram SDK:', error);
 }
