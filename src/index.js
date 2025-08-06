@@ -44,12 +44,26 @@ Try: "How can I improve customer retention?" or "My cash flow is tight"`);
 
 // Apply whitelist middleware to protected commands
 bot.help(checkWhitelist, (ctx) => {
-  ctx.reply(`Commands:
+  const userId = ctx.from.id;
+  const isAdmin = whitelistService.isAdmin(userId);
+  
+  let helpText = `Commands:
 /start - Welcome message
 /help - This help menu
 /status - Bot status
 /clear - Reset conversation
-/tools - Show available MCP tools
+/tools - Show available MCP tools`;
+
+  if (isAdmin) {
+    helpText += `
+
+Admin Commands:
+/whitelist - Show whitelisted users
+/adduser <user_id> [notes] - Add user to whitelist
+/removeuser <user_id> - Remove user from whitelist`;
+  }
+
+  helpText += `
 
 Example questions:
 • "How do I scale my SaaS business?"
@@ -57,7 +71,9 @@ Example questions:
 • "Need to optimize operations"
 • "Revenue is flat, help!"
 
-I'll analyze through Value, Info, Work & Cash flows.`);
+I'll analyze through Value, Info, Work & Cash flows.`;
+
+  ctx.reply(helpText);
 });
 
 bot.command('status', checkWhitelist, (ctx) => {
