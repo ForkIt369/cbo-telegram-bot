@@ -77,7 +77,7 @@
 │  │  PORT=3003                                                          │  │
 │  │  TELEGRAM_BOT_TOKEN=***** (encrypted)                               │  │
 │  │  ANTHROPIC_API_KEY=***** (encrypted)                                │  │
-│  │  WEBHOOK_URL=https://cbo-demo-miniapp-hs2sx.ondigitalocean.app       │  │
+│  │  WEBHOOK_URL=https://cbo-mcp-system-hs2sx.ondigitalocean.app       │  │
 │  └─────────────────────────────────────────────────────────────────────┘  │
 │                                                                             │
 │  ┌─────────────────────────────────────────────────────────────────────┐  │
@@ -145,7 +145,7 @@
 
 ### 5. Deployment
 - **Platform**: DigitalOcean App Platform
-- **URL**: https://cbo-demo-miniapp-hs2sx.ondigitalocean.app
+- **URL**: https://cbo-mcp-system-hs2sx.ondigitalocean.app
 - **Auto-deploy**: Enabled from master branch
 
 ## Next Steps
@@ -156,7 +156,7 @@
    - Use @BotFather
    - Select @cbo_DEVbot
    - Edit Bot > Bot Settings > Menu Button
-   - Set URL: https://cbo-demo-miniapp-hs2sx.ondigitalocean.app/
+   - Set URL: https://cbo-mcp-system-hs2sx.ondigitalocean.app/
 
 ## Security Notes
 
