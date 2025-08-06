@@ -1,7 +1,8 @@
 const logger = require('../utils/logger');
 const memoryBank = require('../memory/memoryBank');
 const claudeService = require('../services/claudeService');
-const claudeServiceWithTools = require('../services/claudeServiceWithTools');
+// MCP tools moved to experimental - using basic service only
+// const claudeServiceWithTools = require('../services/claudeServiceWithTools');
 
 class CBOAgentHandler {
   constructor() {
@@ -21,7 +22,8 @@ class CBOAgentHandler {
     
     try {
       // Use appropriate service based on configuration
-      const service = this.useTools ? claudeServiceWithTools : claudeService;
+      // Always use basic claude service (MCP tools are experimental)
+      const service = claudeService;
       const response = await service.processBusinessQuery(message, context);
       
       context.messages.push({ role: 'assistant', content: response, timestamp: new Date() });

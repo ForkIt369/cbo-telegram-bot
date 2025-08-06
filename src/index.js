@@ -51,8 +51,7 @@ bot.help(checkWhitelist, (ctx) => {
 /start - Welcome message
 /help - This help menu
 /status - Bot status
-/clear - Reset conversation
-/tools - Show available MCP tools`;
+/clear - Reset conversation`;
 
   if (isAdmin) {
     helpText += `
@@ -60,8 +59,7 @@ bot.help(checkWhitelist, (ctx) => {
 Admin Commands:
 /whitelist - Show whitelisted users
 /adduser <user_id> [notes] - Add user to whitelist
-/removeuser <user_id> - Remove user from whitelist
-/mcphealth - Check MCP server health`;
+/removeuser <user_id> - Remove user from whitelist`;
   }
 
   helpText += `
@@ -141,66 +139,67 @@ bot.command('removeuser', checkAdmin, async (ctx) => {
   ctx.reply(result.success ? '✅ ' + result.message : '❌ ' + result.message);
 });
 
-bot.command('tools', checkWhitelist, async (ctx) => {
-  try {
-    if (process.env.ENABLE_MCP_TOOLS !== 'true') {
-      return ctx.reply('🔧 MCP tools are not enabled.\n\nTo enable tools, set ENABLE_MCP_TOOLS=true in environment variables.');
-    }
-    
-    const mcpManager = require('./services/mcpManager');
-    await mcpManager.initialize();
-    
-    const tools = mcpManager.listTools();
-    
-    if (tools.length === 0) {
-      return ctx.reply('🔧 No MCP tools available.\n\nMCP servers may not be connected.');
-    }
-    
-    let message = '🔧 Available MCP Tools:\n\n';
-    for (const tool of tools) {
-      message += `• ${tool.name} (${tool.server})\n  ${tool.description}\n\n`;
-    }
-    
-    ctx.reply(message);
-  } catch (error) {
-    logger.error('Error listing tools:', error);
-    ctx.reply('❌ Failed to list available tools.');
-  }
-});
+// MCP commands moved to experimental - uncomment if you need them
+// bot.command('tools', checkWhitelist, async (ctx) => {
+//   try {
+//     if (process.env.ENABLE_MCP_TOOLS !== 'true') {
+//       return ctx.reply('🔧 MCP tools are not enabled.\n\nTo enable tools, set ENABLE_MCP_TOOLS=true in environment variables.');
+//     }
+//     
+//     const mcpManager = require('./services/mcpManager');
+//     await mcpManager.initialize();
+//     
+//     const tools = mcpManager.listTools();
+//     
+//     if (tools.length === 0) {
+//       return ctx.reply('🔧 No MCP tools available.\n\nMCP servers may not be connected.');
+//     }
+//     
+//     let message = '🔧 Available MCP Tools:\n\n';
+//     for (const tool of tools) {
+//       message += `• ${tool.name} (${tool.server})\n  ${tool.description}\n\n`;
+//     }
+//     
+//     ctx.reply(message);
+//   } catch (error) {
+//     logger.error('Error listing tools:', error);
+//     ctx.reply('❌ Failed to list available tools.');
+//   }
+// });
 
-bot.command('mcphealth', checkAdmin, async (ctx) => {
-  try {
-    const mcpManager = require('./services/mcpManager');
-    await mcpManager.initialize();
-    
-    const health = await mcpManager.checkHealth();
-    
-    let message = '🏥 MCP Server Health:\n\n';
-    
-    for (const [server, status] of Object.entries(health)) {
-      const emoji = status.status === 'healthy' ? '✅' : '❌';
-      message += `${emoji} ${server}\n`;
-      message += `  Status: ${status.status}\n`;
-      message += `  Connected: ${status.connected ? 'Yes' : 'No'}\n`;
-      message += `  Tools: ${status.toolCount || 0}\n`;
-      
-      if (status.error) {
-        message += `  Error: ${status.error}\n`;
-      }
-      
-      if (status.registry) {
-        message += `  Registry: ${status.registry.healthy ? 'Healthy' : 'Unhealthy'}\n`;
-      }
-      
-      message += '\n';
-    }
-    
-    ctx.reply(message);
-  } catch (error) {
-    logger.error('Error checking MCP health:', error);
-    ctx.reply('❌ Failed to check MCP server health.');
-  }
-});
+// bot.command('mcphealth', checkAdmin, async (ctx) => {
+//   try {
+//     const mcpManager = require('./services/mcpManager');
+//     await mcpManager.initialize();
+//     
+//     const health = await mcpManager.checkHealth();
+//     
+//     let message = '🏥 MCP Server Health:\n\n';
+//     
+//     for (const [server, status] of Object.entries(health)) {
+//       const emoji = status.status === 'healthy' ? '✅' : '❌';
+//       message += `${emoji} ${server}\n`;
+//       message += `  Status: ${status.status}\n`;
+//       message += `  Connected: ${status.connected ? 'Yes' : 'No'}\n`;
+//       message += `  Tools: ${status.toolCount || 0}\n`;
+//       
+//       if (status.error) {
+//         message += `  Error: ${status.error}\n`;
+//       }
+//       
+//       if (status.registry) {
+//         message += `  Registry: ${status.registry.healthy ? 'Healthy' : 'Unhealthy'}\n`;
+//       }
+//       
+//       message += '\n';
+//     }
+//     
+//     ctx.reply(message);
+//   } catch (error) {
+//     logger.error('Error checking MCP health:', error);
+//     ctx.reply('❌ Failed to check MCP server health.');
+//   }
+// });
 
 bot.on('text', checkWhitelist, async (ctx) => {
   const userId = ctx.from.id;
@@ -258,7 +257,7 @@ bot.on('text', checkWhitelist, async (ctx) => {
   }
 });
 
-const PORT = process.env.PORT || 3003;
+const PORT = process.env.PORT || 3001;
 
 // Express middleware - MUST be first
 app.use(express.json());

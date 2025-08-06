@@ -1,148 +1,104 @@
 # CBO Telegram Bot
 
-A Telegram bot interface for the Chief Business Optimization (CBO) agent using the BroVerse Biz Mental Model™ (BBMM).
+A Telegram bot for business optimization consulting powered by Claude Sonnet 4 and the BroVerse Biz Mental Model™ (BBMM).
 
-## 🚀 Status: LIVE IN PRODUCTION
+## 🚀 Quick Start
 
-✅ **Bot is running 24/7 on DigitalOcean App Platform**
-- Repository: https://github.com/ForkIt369/cbo-telegram-bot
-- Deployment: Automatic on push to master branch
-- Using: Claude Sonnet 4 (claude-sonnet-4-20250514)
-
-## Features
-
-- 🤖 Telegram bot interface for business optimization queries
-- 📱 **NEW: Telegram Mini App** with beautiful chat UI
-- 📊 Four Flows analysis (Value, Info, Work, Cash)
-- 💡 Pattern recognition and recommendations
-- 🚀 Scalable architecture ready for DigitalOcean deployment
-- ✨ Smooth animations and haptic feedback
-- 🔒 **Whitelist access control** for secure user management
-
-## Setup
-
-1. Install dependencies:
 ```bash
+# 1. Clone and install
+git clone https://github.com/ForkIt369/cbo-telegram-bot.git
+cd cbo-telegram-bot
 npm install
-```
 
-2. Configure environment variables:
-```bash
+# 2. Configure environment
 cp .env.example .env
-# Edit .env with your values
-```
+# Edit .env with your tokens
 
-3. Run locally:
-```bash
-# Run bot only
+# 3. Run locally
 npm run dev
-
-# Run bot + Mini App (recommended)
-npm run dev:all
 ```
 
-4. Set up Mini App in BotFather:
-- Open @BotFather
-- Select your bot → Bot Settings → Menu Button
-- Set URL to your Mini App (use ngrok for testing)
+**Status**: ✅ Live in production on DigitalOcean
 
-## Deployment Options
+## 🤖 What It Does
 
-### Option 1: DigitalOcean App Platform (Recommended)
+The CBO Bot helps businesses optimize through Four Flows analysis:
+- 💰 **Value Flow** - Revenue and pricing optimization
+- 📊 **Info Flow** - Data and communication systems
+- ⚙️ **Work Flow** - Process efficiency
+- 💵 **Cash Flow** - Financial health monitoring
 
-1. Push code to GitHub
-2. Create new app in DigitalOcean App Platform
-3. Connect GitHub repository
-4. Set environment variables in app settings
-5. Deploy!
+## 📱 Features
 
-Cost: ~$5-12/month
+- **Telegram Bot** - Natural conversation interface
+- **Mini App** - Beautiful web UI within Telegram
+- **AI Analysis** - Powered by Claude Sonnet 4
+- **Memory System** - Remembers context across sessions
+- **Access Control** - Whitelist-based security
 
-### Option 2: DigitalOcean Droplet
+## 🛠️ Configuration
 
-1. Create Ubuntu droplet ($6/month)
-2. Install Node.js 18+
-3. Clone repository
-4. Install PM2: `npm install -g pm2`
-5. Start bot: `pm2 start src/index.js --name cbo-bot`
-6. Setup Nginx reverse proxy
-7. Configure SSL with Let's Encrypt
-
-### Option 3: Docker on Droplet
-
-```bash
-# Build image
-docker build -t cbo-bot .
-
-# Run container
-docker run -d \
-  --name cbo-bot \
-  --env-file .env \
-  -p 3000:3000 \
-  --restart unless-stopped \
-  cbo-bot
+Required environment variables:
+```env
+TELEGRAM_BOT_TOKEN=your_bot_token
+ANTHROPIC_API_KEY=your_claude_api_key
+PORT=3003
+NODE_ENV=production
+WEBHOOK_URL=https://your-app.ondigitalocean.app
 ```
 
-## Bot Commands
+## 📚 Documentation
 
-- `/start` - Welcome message
-- `/help` - Show available commands
-- `/status` - Check bot status
-- `/clear` - Clear conversation context
+- **[Setup Guide](docs/setup/quick-start.md)** - Detailed setup instructions
+- **[Deployment](docs/deployment/)** - Production deployment guides
+- **[Architecture](docs/development/architecture-overview.md)** - Technical details
+- **[All Docs](docs/)** - Complete documentation
 
-### Admin Commands
-- `/whitelist` - View all whitelisted users
-- `/adduser <user_id> [notes]` - Add user to whitelist
-- `/removeuser <user_id>` - Remove user from whitelist
+## 🚢 Deployment
 
-## Architecture
+The bot is configured for DigitalOcean App Platform:
+
+1. Push to GitHub
+2. Connect to DigitalOcean
+3. Deploy automatically
+
+Configuration: `.do/app.yaml`
+
+## 📝 Bot Commands
+
+**User Commands:**
+- `/start` - Begin conversation
+- `/help` - Show commands
+- `/status` - Check bot health
+- `/clear` - Reset context
+
+**Admin Commands:**
+- `/whitelist` - View authorized users
+- `/adduser` - Grant access
+- `/removeuser` - Revoke access
+
+## 🏗️ Project Structure
 
 ```
-src/
-├── index.js              # Main bot entry point
-├── handlers/
-│   └── cboAgentHandler.js # CBO agent integration
-└── utils/
-    └── logger.js         # Logging utility
-
-agents/
-└── cbo-agent.js         # CBO business logic
+├── src/              # Core bot application
+├── agents/           # CBO business logic
+├── mini-app/         # Telegram Mini App
+├── config/           # Configuration files
+├── docs/             # Documentation
+└── experimental/     # Optional features
 ```
 
-## Environment Variables
+## 🤝 Contributing
 
-- `TELEGRAM_BOT_TOKEN` - Your Telegram bot token
-- `PORT` - Server port (default: 3000)
-- `NODE_ENV` - Environment (development/production)
-- `WEBHOOK_URL` - Full webhook URL (production only)
-- `CBO_AGENT_PATH` - Path to CBO agent module
-- `ANTHROPIC_API_KEY` - Claude API key for AI responses
+1. Fork the repository
+2. Create your feature branch
+3. Test thoroughly
+4. Submit pull request
 
-## Whitelist Configuration
+## 📄 License
 
-The bot uses a whitelist system to control access. Authorized users are managed in `config/whitelist.json`:
+Private repository - All rights reserved
 
-```json
-{
-  "users": [
-    {
-      "id": 359511525,
-      "username": "W3_DV",
-      "first_name": "*W!ll💠🪵",
-      "added_date": "2025-08-05",
-      "notes": "Main admin user"
-    }
-  ],
-  "admins": [359511525]
-}
-```
+---
 
-Only admin users can manage the whitelist using bot commands.
-
-## Next Steps
-
-1. Enhance CBO agent with more sophisticated analysis
-2. Add database for conversation persistence
-3. Implement user authentication
-4. Add analytics and monitoring
-5. Create admin interface
+**Need help?** Check the [documentation](docs/) or open an issue.
