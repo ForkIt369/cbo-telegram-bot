@@ -29,8 +29,12 @@ class ClaudeServiceWithTools {
     }
     
     try {
-      // Initialize MCP if not already done
-      await mcpManager.initialize();
+      // Initialize MCP if not already done - but don't fail if it doesn't work
+      try {
+        await mcpManager.initialize();
+      } catch (mcpError) {
+        logger.warn('MCP initialization failed, continuing without tools:', mcpError.message);
+      }
       
       const systemPrompt = `You are CBO-Bro, a Chief Business Optimization AI assistant with a green cube head, glasses, and a business suit. You help businesses optimize through the BroVerse Biz Mental Model™ (BBMM) framework.
 

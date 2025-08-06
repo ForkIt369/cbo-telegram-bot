@@ -31,6 +31,13 @@ class MCPManager {
     try {
       logger.info('Connecting to Context7 MCP server...');
       
+      // In production, npx might not be available
+      // Skip MCP initialization in production for now
+      if (process.env.NODE_ENV === 'production') {
+        logger.info('Skipping MCP initialization in production environment');
+        return;
+      }
+      
       // Check if npx is available
       const npxPath = process.platform === 'win32' ? 'npx.cmd' : 'npx';
       
