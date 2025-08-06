@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CBO Bro - Business Optimization Chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* BroVerse Design System - CBO Theme */
+        :root {
+            /* CBO Brand Colors */
+            --cbo-primary: #30D158;
+            --cbo-secondary: #00C851;
+            --cbo-glow: rgba(48, 209, 88, 0.3);
+            
+            /* Supporting Avatar Colors */
+            --bigsis-primary: #00D4FF;
+            --bro-primary: #FF9500;
+            --lilsis-primary: #9D4EDD;
+            
+            /* Dark Theme Foundation */
+            --bg-primary: #0D1117;
+            --bg-secondary: #161B22;
+            --bg-tertiary: #21262D;
+            
+            /* Glass Effects */
+            --glass-bg: rgba(255, 255, 255, 0.02);
+            --glass-bg-hover: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --glass-border-hover: rgba(255, 255, 255, 0.08);
+            
+            /* Text Hierarchy */
+            --text-primary: #FFFFFF;
+            --text-secondary: rgba(255, 255, 255, 0.8);
+            --text-tertiary: rgba(255, 255, 255, 0.6);
+            --text-muted: rgba(255, 255, 255, 0.4);
+            
+            /* Typography */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            
+            /* Spacing */
+            --space-1: 8px;
+            --space-2: 16px;
+            --space-3: 24px;
+            --space-4: 32px;
+            
+            /* Layout */
+            --header-height: 56px;
+            --input-bar-height: 72px;
+            --safe-area-top: env(safe-area-inset-top);
+            --safe-area-bottom: env(safe-area-inset-bottom);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            padding: 0 var(--space-2);
+            z-index: 100;
+            padding-top: var(--safe-area-top);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .avatar-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar-img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--cbo-primary), var(--cbo-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--bg-primary);
+        }
+
+        .avatar-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .avatar-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .avatar-status {
+            font-size: 12px;
+            color: var(--cbo-primary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--cbo-primary);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .header-btn:active {
+            transform: scale(0.95);
+            background: var(--glass-bg-hover);
+        }
+
+        /* Chat Container */
+        .chat-container {
+            flex: 1;
+            padding-top: calc(var(--header-height) + var(--safe-area-top));
+            padding-bottom: calc(var(--input-bar-height) + var(--safe-area-bottom));
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .chat-messages {
+            padding: var(--space-2);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            min-height: 100%;
+        }
+
+        /* Welcome Message */
+        .welcome-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: var(--space-3);
+            margin: var(--space-2) 0;
+            text-align: center;
+        }
+
+        .welcome-title {
+            font-size: 24px;
+            font-weight: 300;
+            margin-bottom: var(--space-1);
+            background: linear-gradient(135deg, var(--cbo-primary), var(--cbo-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .welcome-subtitle {
+            font-size: 14px;
+            color: var(--text-tertiary);
+            margin-bottom: var(--space-3);
+        }
+
+        /* Flow Cards */
+        .flow-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-2);
+            margin-top: var(--space-3);
+        }
+
+        .flow-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: var(--space-2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .flow-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--flow-color);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .flow-card:active {
+            transform: scale(0.95);
+        }
+
+        .flow-card.value { --flow-color: var(--bigsis-primary); }
+        .flow-card.info { --flow-color: var(--bro-primary); }
+        .flow-card.work { --flow-color: var(--lilsis-primary); }
+        .flow-card.cash { --flow-color: var(--cbo-primary); }
+
+        .flow-card:hover::before {
+            opacity: 1;
+        }
+
+        .flow-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--flow-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--space-1);
+            font-size: 18px;
+        }
+
+        .flow-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .flow-desc {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        /* Messages */
+        .message {
+            display: flex;
+            gap: var(--space-2);
+            max-width: 85%;
+            animation: messageSlide 0.3s ease;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--cbo-primary), var(--cbo-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--bg-primary);
+            flex-shrink: 0;
+        }
+
+        .message.user .message-avatar {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+        }
+
+        .message-content {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: var(--space-2);
+            position: relative;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, 
+                rgba(48, 209, 88, 0.1), 
+                rgba(0, 200, 81, 0.05));
+            border-color: rgba(48, 209, 88, 0.2);
+        }
+
+        .message-text {
+            font-size: 15px;
+            line-height: 1.5;
+            color: var(--text-primary);
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: var(--space-2);
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--cbo-primary);
+            animation: typing 1.4s ease-in-out infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                opacity: 0.3;
+                transform: translateY(0);
+            }
+            30% {
+                opacity: 1;
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Input Bar */
+        .input-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--glass-border);
+            padding: var(--space-2);
+            padding-bottom: calc(var(--space-2) + var(--safe-area-bottom));
+            z-index: 100;
+        }
+
+        .input-container {
+            display: flex;
+            gap: var(--space-1);
+            align-items: center;
+        }
+
+        .input-left-controls,
+        .input-right-controls {
+            display: flex;
+            gap: 4px;
+        }
+
+        .input-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: transparent;
+            border: none;
+            color: var(--text-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .input-btn:active {
+            transform: scale(0.9);
+            color: var(--cbo-primary);
+        }
+
+        .input-btn.active {
+            color: var(--cbo-primary);
+        }
+
+        .input-field-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .input-field {
+            width: 100%;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 10px 16px;
+            font-size: 15px;
+            color: var(--text-primary);
+            font-family: var(--font-primary);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .input-field:focus {
+            border-color: var(--cbo-primary);
+            background: var(--glass-bg-hover);
+        }
+
+        .input-field::placeholder {
+            color: var(--text-muted);
+        }
+
+        .send-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--cbo-primary), var(--cbo-secondary));
+            border: none;
+            color: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .send-btn:active {
+            transform: scale(0.9);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Mode Selector Popup */
+        .mode-selector {
+            position: fixed;
+            bottom: calc(var(--input-bar-height) + var(--space-2) + var(--safe-area-bottom));
+            left: var(--space-2);
+            background: var(--bg-secondary);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: var(--space-1);
+            display: none;
+            z-index: 200;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .mode-selector.active {
+            display: block;
+            animation: popIn 0.2s ease;
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .mode-option {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .mode-option:hover {
+            background: var(--glass-bg);
+        }
+
+        .mode-option.active {
+            background: rgba(48, 209, 88, 0.1);
+        }
+
+        .mode-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .mode-info {
+            flex: 1;
+        }
+
+        .mode-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .mode-desc {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        /* SVG Icons */
+        .icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="avatar-badge">
+                <div class="avatar-img">CBO</div>
+                <div class="avatar-info">
+                    <div class="avatar-name">Chief Bro Officer</div>
+                    <div class="avatar-status">
+                        <span class="status-dot"></span>
+                        <span>Analyzing flows</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn" aria-label="New chat">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M12 5v14m-7-7h14"/>
+                    </svg>
+                </button>
+                <button class="header-btn" aria-label="Menu">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="1"/>
+                        <circle cx="12" cy="5" r="1"/>
+                        <circle cx="12" cy="19" r="1"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Chat Container -->
+    <div class="chat-container">
+        <div class="chat-messages" id="chatMessages">
+            <!-- Welcome Card -->
+            <div class="welcome-card">
+                <h1 class="welcome-title">Welcome to BroVerse Business</h1>
+                <p class="welcome-subtitle">I'm your Chief Bro Officer, ready to optimize your business flows</p>
+                
+                <div class="flow-grid">
+                    <div class="flow-card value" onclick="selectFlow('value')">
+                        <div class="flow-icon">💎</div>
+                        <div class="flow-title">Value Flow</div>
+                        <div class="flow-desc">Customer journey</div>
+                    </div>
+                    <div class="flow-card info" onclick="selectFlow('info')">
+                        <div class="flow-icon">📊</div>
+                        <div class="flow-title">Info Flow</div>
+                        <div class="flow-desc">Data & insights</div>
+                    </div>
+                    <div class="flow-card work" onclick="selectFlow('work')">
+                        <div class="flow-icon">⚡</div>
+                        <div class="flow-title">Work Flow</div>
+                        <div class="flow-desc">Operations</div>
+                    </div>
+                    <div class="flow-card cash" onclick="selectFlow('cash')">
+                        <div class="flow-icon">💰</div>
+                        <div class="flow-title">Cash Flow</div>
+                        <div class="flow-desc">Revenue streams</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mode Selector Popup -->
+    <div class="mode-selector" id="modeSelector">
+        <div class="mode-option active" data-mode="analyze">
+            <div class="mode-icon" style="background: var(--cbo-primary);">🔍</div>
+            <div class="mode-info">
+                <div class="mode-name">Analyze Mode</div>
+                <div class="mode-desc">Deep business analysis</div>
+            </div>
+        </div>
+        <div class="mode-option" data-mode="quick">
+            <div class="mode-icon" style="background: var(--bro-primary);">⚡</div>
+            <div class="mode-info">
+                <div class="mode-name">Quick Insights</div>
+                <div class="mode-desc">Rapid assessments</div>
+            </div>
+        </div>
+        <div class="mode-option" data-mode="strategy">
+            <div class="mode-icon" style="background: var(--lilsis-primary);">🎯</div>
+            <div class="mode-info">
+                <div class="mode-name">Strategy Mode</div>
+                <div class="mode-desc">Long-term planning</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input Bar -->
+    <div class="input-bar">
+        <div class="input-container">
+            <!-- Left Controls -->
+            <div class="input-left-controls">
+                <button class="input-btn" id="modeBtn" aria-label="Mode">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                </button>
+                <button class="input-btn" aria-label="History">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" fill="none" stroke-width="2"/>
+                    </svg>
+                </button>
+                <button class="input-btn" aria-label="Suggestions">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" stroke="currentColor" fill="none" stroke-width="2"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Input Field -->
+            <div class="input-field-wrapper">
+                <input 
+                    type="text" 
+                    class="input-field" 
+                    id="messageInput"
+                    placeholder="Ask about your business flows..."
+                    autocomplete="off"
+                />
+            </div>
+
+            <!-- Right Controls -->
+            <div class="input-right-controls">
+                <button class="input-btn" aria-label="Attach">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" stroke="currentColor" fill="none" stroke-width="2"/>
+                    </svg>
+                </button>
+                <button class="input-btn" aria-label="Voice">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2M12 19v4" stroke="currentColor" fill="none" stroke-width="2"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Send Button -->
+            <button class="send-btn" id="sendBtn" aria-label="Send">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Chat functionality
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const modeBtn = document.getElementById('modeBtn');
+        const modeSelector = document.getElementById('modeSelector');
+
+        let currentMode = 'analyze';
+        let isTyping = false;
+
+        // Mode selector
+        modeBtn.addEventListener('click', () => {
+            modeSelector.classList.toggle('active');
+        });
+
+        document.querySelectorAll('.mode-option').forEach(option => {
+            option.addEventListener('click', () => {
+                currentMode = option.dataset.mode;
+                document.querySelectorAll('.mode-option').forEach(o => o.classList.remove('active'));
+                option.classList.add('active');
+                modeSelector.classList.remove('active');
+                
+                // Update mode button color
+                if (currentMode === 'quick') {
+                    modeBtn.style.color = 'var(--bro-primary)';
+                } else if (currentMode === 'strategy') {
+                    modeBtn.style.color = 'var(--lilsis-primary)';
+                } else {
+                    modeBtn.style.color = 'var(--cbo-primary)';
+                }
+            });
+        });
+
+        // Close mode selector when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!modeBtn.contains(e.target) && !modeSelector.contains(e.target)) {
+                modeSelector.classList.remove('active');
+            }
+        });
+
+        // Send message
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, 'user');
+            messageInput.value = '';
+
+            // Show typing indicator
+            showTyping();
+
+            // Simulate bot response
+            setTimeout(() => {
+                hideTyping();
+                const response = generateResponse(message);
+                addMessage(response, 'bot');
+            }, 1500);
+        }
+
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const time = new Date().toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit' 
+            });
+
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${sender === 'user' ? 'You' : 'CBO'}</div>
+                <div class="message-content">
+                    <div class="message-text">${text}</div>
+                    <div class="message-time">${time}</div>
+                </div>
+            `;
+
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showTyping() {
+            if (isTyping) return;
+            isTyping = true;
+            
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `
+                <div class="message-avatar">CBO</div>
+                <div class="message-content">
+                    <div class="typing-indicator">
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                    </div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function hideTyping() {
+            isTyping = false;
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) indicator.remove();
+        }
+
+        function generateResponse(message) {
+            const responses = {
+                analyze: [
+                    "Let me analyze your business flows using the BBMM framework. I can see opportunities to optimize your value stream...",
+                    "Based on the Four Flows analysis, your primary bottleneck appears to be in the information flow between departments...",
+                    "Interesting! This relates to your Work Flow efficiency. Let me break down the operational patterns I'm seeing..."
+                ],
+                quick: [
+                    "Quick insight: Your cash flow cycle could be shortened by 15% with better invoice management.",
+                    "Here's the deal: Focus on your value flow first - customers are waiting too long at checkout.",
+                    "Fast take: Your info flow needs attention - data silos are costing you decisions."
+                ],
+                strategy: [
+                    "For long-term growth, consider restructuring your value chain to emphasize direct customer relationships...",
+                    "Strategic recommendation: Invest in automating your work flow to free up resources for innovation...",
+                    "Looking ahead, your cash flow patterns suggest opportunity for subscription-based revenue models..."
+                ]
+            };
+
+            const modeResponses = responses[currentMode] || responses.analyze;
+            return modeResponses[Math.floor(Math.random() * modeResponses.length)];
+        }
+
+        function selectFlow(flow) {
+            const flowMessages = {
+                value: "Let's explore your Value Flow. How are customers currently experiencing your product or service?",
+                info: "I'll help analyze your Information Flow. What data challenges are you facing?",
+                work: "Time to optimize your Work Flow. Where do you see operational bottlenecks?",
+                cash: "Let's examine your Cash Flow. What's your current revenue cycle looking like?"
+            };
+
+            addMessage(flowMessages[flow], 'bot');
+        }
+
+        // Event listeners
+        sendBtn.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Initial greeting
+        setTimeout(() => {
+            addMessage("Hey! I'm your Chief Bro Officer. I use the BroVerse Biz Mental Model™ to analyze your business through Four Flows: Value, Info, Work, and Cash. What aspect of your business would you like to optimize today?", 'bot');
+        }, 500);
+    </script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+/* Telegram Mobile Wrapper Styles */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Phone Frame */
+.telegram-wrapper {
+    width: 375px;
+    height: 812px;
+    background: #000;
+    border-radius: 40px;
+    padding: 10px;
+    box-shadow: 
+        0 0 0 12px #1a1a1a,
+        0 0 0 14px #333,
+        0 20px 40px rgba(0, 0, 0, 0.4),
+        0 40px 80px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Inner Screen */
+.telegram-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    background: #fff;
+    border-radius: 30px;
+    z-index: -1;
+}
+
+/* Phone Status Bar */
+.phone-status-bar {
+    height: 44px;
+    background: #fff;
+    border-radius: 30px 30px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    padding-top: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #000;
+}
+
+.status-time {
+    flex: 1;
+}
+
+.status-icons {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.status-icon {
+    opacity: 0.9;
+}
+
+.status-icon.battery {
+    margin-left: 2px;
+}
+
+/* Telegram Header */
+.telegram-header {
+    height: 56px;
+    background: #517da2;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    color: white;
+}
+
+.tg-back-btn,
+.tg-menu-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: transparent;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.tg-back-btn:active,
+.tg-menu-btn:active {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.tg-header-center {
+    flex: 1;
+    text-align: center;
+}
+
+.tg-app-name {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.tg-app-subtitle {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+/* Mini App Container */
+.mini-app-container {
+    height: calc(100% - 44px - 56px - 60px); /* Minus status, header, and bottom bar */
+    background: #0D1117;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Telegram Bottom Navigation */
+.telegram-bottom-bar {
+    height: 60px;
+    background: #f2f2f2;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    border-radius: 0 0 30px 30px;
+}
+
+.tg-nav-btn {
+    flex: 1;
+    height: 100%;
+    border: none;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: #8e8e93;
+    font-size: 10px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.tg-nav-btn.active {
+    color: #517da2;
+}
+
+.tg-nav-btn:active {
+    opacity: 0.7;
+}
+
+.tg-nav-btn span {
+    font-weight: 500;
+}
+
+/* Responsive adjustments for larger screens */
+@media (min-width: 768px) {
+    .telegram-wrapper {
+        transform: scale(1.1);
+    }
+}
+
+@media (min-width: 1024px) {
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .telegram-wrapper {
+        transform: scale(1.2);
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    body {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    }
+}
+
+/* Notch simulation */
+.telegram-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140px;
+    height: 28px;
+    background: #000;
+    border-radius: 0 0 20px 20px;
+    z-index: 10;
+}

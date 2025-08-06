@@ -1,4 +1,4 @@
-name: cbo-telegram-bot
+name: cbo-demo-miniapp
 region: nyc
 services:
 - environment_slug: node-js

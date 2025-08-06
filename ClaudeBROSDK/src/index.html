@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ClaudeBRO SDK - Business Optimization Chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/chat.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="brand">
+                    <img src="assets/avatars/cbo.png" alt="CBO" class="brand-avatar">
+                    <div class="brand-info">
+                        <h1 class="brand-name">ClaudeBRO SDK</h1>
+                        <div class="connection-status disconnected">Connecting...</div>
+                    </div>
+                </div>
+                
+                <!-- Mode Switcher -->
+                <div class="mode-switcher">
+                    <button class="mode-btn active" data-mode="analyze">
+                        <span class="mode-icon">📊</span>
+                        <span class="mode-label">Analyze</span>
+                    </button>
+                    <button class="mode-btn" data-mode="create">
+                        <span class="mode-icon">🎨</span>
+                        <span class="mode-label">Create</span>
+                    </button>
+                    <button class="mode-btn" data-mode="research">
+                        <span class="mode-icon">🔍</span>
+                        <span class="mode-label">Research</span>
+                    </button>
+                    <button class="mode-btn" data-mode="optimize">
+                        <span class="mode-icon">⚡</span>
+                        <span class="mode-label">Optimize</span>
+                    </button>
+                </div>
+
+                <div class="header-actions">
+                    <button class="action-btn" id="clearBtn" aria-label="Clear chat">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        </svg>
+                    </button>
+                    <button class="action-btn" id="settingsBtn" aria-label="Settings">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor" d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5a3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97c0-.33-.03-.65-.07-.97l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65A.488.488 0 0 0 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.63c-.04.32-.07.64-.07.97c0 .33.03.65.07.97l-2.11 1.63c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.13-.22.07-.49-.12-.64l-2.11-1.63Z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Welcome Screen -->
+        <div class="welcome-screen" id="welcomeScreen">
+            <div class="welcome-content">
+                <div class="welcome-avatar">
+                    <img src="assets/avatars/cbo.png" alt="CBO">
+                    <div class="welcome-badge">Powered by Claude 3.5 Sonnet</div>
+                </div>
+                
+                <h1 class="welcome-title">Chief Bro Officer</h1>
+                <p class="welcome-subtitle">Your AI Business Optimization Expert</p>
+                
+                <div class="welcome-features">
+                    <div class="feature-card">
+                        <span class="feature-icon">💎</span>
+                        <h3>Value Flow</h3>
+                        <p>Analyze how value is created and delivered</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">📊</span>
+                        <h3>Info Flow</h3>
+                        <p>Optimize information movement</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">⚡</span>
+                        <h3>Work Flow</h3>
+                        <p>Streamline processes and operations</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">💰</span>
+                        <h3>Cash Flow</h3>
+                        <p>Maximize financial efficiency</p>
+                    </div>
+                </div>
+                
+                <button class="start-btn" onclick="startChat()">
+                    Start Optimization Journey
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="currentColor" d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="chat-container" id="chatContainer" style="display: none;">
+            <div class="chat-messages" id="chatMessages">
+                <!-- Messages will be added dynamically -->
+            </div>
+            
+            <!-- Input Bar -->
+            <div class="input-bar">
+                <div class="input-container">
+                    <button class="attach-btn" id="attachBtn" aria-label="Attach file">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor" d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/>
+                        </svg>
+                    </button>
+                    
+                    <input 
+                        type="text" 
+                        class="message-input" 
+                        id="messageInput"
+                        placeholder="Ask about your business..."
+                        autocomplete="off"
+                    />
+                    
+                    <button class="send-btn" id="sendBtn" aria-label="Send message">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/websocket.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
