@@ -46,6 +46,20 @@ class MCPRegistry {
         apiKey: process.env.MCP_GITHUB_API_KEY,
         capabilities: ['code-search', 'repo-operations'],
         enabled: process.env.MCP_GITHUB_ENABLED === 'true'
+      },
+      {
+        id: 'notion',
+        name: 'Notion API',
+        description: 'Notion database, page, and content management',
+        transport: process.env.NODE_ENV === 'production' ? 'http' : 'stdio',
+        // Production config
+        endpoint: process.env.MCP_NOTION_ENDPOINT,
+        apiKey: process.env.MCP_NOTION_API_KEY,
+        // Development config
+        command: 'npx',
+        args: ['-y', '@notionhq/notion-mcp-server'],
+        capabilities: ['database-operations', 'page-operations', 'block-operations', 'search', 'comments', 'file-upload'],
+        enabled: process.env.MCP_NOTION_ENABLED === 'true'
       }
     ];
 
