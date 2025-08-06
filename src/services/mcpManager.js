@@ -1,6 +1,7 @@
 const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
 const { StdioClientTransport } = require('@modelcontextprotocol/sdk/client/stdio.js');
-const { spawn } = require('child_process');
+const HttpClientTransport = require('./transports/httpClientTransport');
+const mcpRegistry = require('./mcpRegistry');
 const logger = require('../utils/logger');
 
 class MCPManager {
@@ -16,36 +17,51 @@ class MCPManager {
     try {
       logger.info('Initializing MCP Manager...');
       
-      // Initialize Context7 MCP as our first real MCP server
-      await this.connectContext7();
+      // Connect to all enabled servers from registry
+      const enabledServers = mcpRegistry.getEnabledServers();
+      logger.info(`Found ${enabledServers.length} enabled MCP servers`);
+      
+      for (const serverConfig of enabledServers) {
+        await this.connectServer(serverConfig.id);
+      }
       
       this.initialized = true;
-      logger.info(`MCP Manager initialized with ${this.tools.size} tools`);
+      logger.info(`MCP Manager initialized with ${this.tools.size} tools from ${this.servers.size} servers`);
     } catch (error) {
       logger.error('Failed to initialize MCP Manager:', error);
       // Don't throw - allow bot to work without MCP
     }
   }
 
-  async connectContext7() {
+  async connectServer(serverId) {
     try {
-      logger.info('Connecting to Context7 MCP server...');
-      
-      // In production, npx might not be available
-      // Skip MCP initialization in production for now
-      if (process.env.NODE_ENV === 'production') {
-        logger.info('Skipping MCP initialization in production environment');
+      const config = mcpRegistry.getConnectionConfig(serverId);
+      if (!config) {
+        logger.error(`Server ${serverId} not found in registry`);
         return;
       }
       
-      // Check if npx is available
-      const npxPath = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+      logger.info(`Connecting to ${config.name} MCP server...`);
       
-      // Create transport for Context7 MCP server
-      const transport = new StdioClientTransport({
-        command: npxPath,
-        args: ['-y', '@upstash/context7-mcp']
-      });
+      // Create appropriate transport based on config
+      let transport;
+      
+      if (config.transport === 'http' || config.transport === 'sse') {
+        // Use HTTP transport for production
+        transport = new HttpClientTransport({
+          endpoint: config.endpoint,
+          headers: config.headers,
+          transport: config.transport
+        });
+      } else if (config.transport === 'stdio') {
+        // Use stdio transport for development
+        transport = new StdioClientTransport({
+          command: config.command,
+          args: config.args
+        });
+      } else {
+        throw new Error(`Unknown transport type: ${config.transport}`);
+      }
 
       // Create MCP client
       const client = new Client({
@@ -62,23 +78,29 @@ class MCPManager {
       
       // Discover available tools
       const tools = await client.listTools();
-      logger.info(`Context7 MCP connected with ${tools.tools.length} tools`);
+      logger.info(`${config.name} connected with ${tools.tools.length} tools`);
       
-      // Store server and tools
-      this.servers.set('context7', { client, transport });
+      // Store server connection
+      this.servers.set(serverId, { 
+        client, 
+        transport,
+        config 
+      });
       
-      // Register each tool
+      // Register each tool with server prefix to avoid conflicts
       for (const tool of tools.tools) {
-        this.tools.set(tool.name, {
-          server: 'context7',
+        const toolName = `${serverId}:${tool.name}`;
+        this.tools.set(toolName, {
+          server: serverId,
+          originalName: tool.name,
           definition: tool
         });
-        logger.info(`Registered tool: ${tool.name}`);
+        logger.info(`Registered tool: ${toolName}`);
       }
       
     } catch (error) {
-      logger.error('Failed to connect Context7 MCP:', error);
-      // Continue without Context7 - non-critical failure
+      logger.error(`Failed to connect ${serverId} MCP:`, error);
+      // Continue without this server - non-critical failure
     }
   }
 
@@ -88,8 +110,8 @@ class MCPManager {
     
     for (const [name, info] of this.tools) {
       tools.push({
-        name: info.definition.name,
-        description: info.definition.description,
+        name: name, // Use full name with server prefix
+        description: `[${info.server}] ${info.definition.description}`,
         input_schema: info.definition.inputSchema
       });
     }
@@ -111,8 +133,9 @@ class MCPManager {
     try {
       logger.info(`Calling tool ${toolName} with params:`, params);
       
+      // Use original tool name when calling the server
       const result = await serverInfo.client.callTool({
-        name: toolName,
+        name: toolInfo.originalName,
         arguments: params
       });
       
@@ -162,6 +185,81 @@ class MCPManager {
       });
     }
     return tools;
+  }
+
+  // Get tools by server
+  getToolsByServer(serverId) {
+    const tools = [];
+    for (const [name, info] of this.tools) {
+      if (info.server === serverId) {
+        tools.push({
+          name: name,
+          description: info.definition.description
+        });
+      }
+    }
+    return tools;
+  }
+
+  // Check health of all connected servers
+  async checkHealth() {
+    const health = {};
+    
+    for (const [serverId, serverInfo] of this.servers) {
+      try {
+        // Try to list tools as a health check
+        await serverInfo.client.listTools();
+        health[serverId] = { 
+          status: 'healthy',
+          connected: true,
+          toolCount: this.getToolsByServer(serverId).length
+        };
+      } catch (error) {
+        health[serverId] = {
+          status: 'unhealthy',
+          connected: false,
+          error: error.message
+        };
+      }
+    }
+    
+    // Also check registry health for HTTP servers
+    const registryHealth = await mcpRegistry.checkAllServersHealth();
+    
+    // Merge results
+    for (const [serverId, status] of Object.entries(registryHealth)) {
+      if (health[serverId]) {
+        health[serverId].registry = status;
+      }
+    }
+    
+    return health;
+  }
+
+  // Reconnect to a specific server
+  async reconnectServer(serverId) {
+    logger.info(`Attempting to reconnect to ${serverId}...`);
+    
+    // Disconnect existing connection
+    const serverInfo = this.servers.get(serverId);
+    if (serverInfo) {
+      try {
+        await serverInfo.client.close();
+      } catch (error) {
+        logger.error(`Error closing existing connection:`, error);
+      }
+      this.servers.delete(serverId);
+      
+      // Remove tools from this server
+      for (const [name, info] of this.tools) {
+        if (info.server === serverId) {
+          this.tools.delete(name);
+        }
+      }
+    }
+    
+    // Reconnect
+    await this.connectServer(serverId);
   }
 }
 

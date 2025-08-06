@@ -60,7 +60,8 @@ bot.help(checkWhitelist, (ctx) => {
 Admin Commands:
 /whitelist - Show whitelisted users
 /adduser <user_id> [notes] - Add user to whitelist
-/removeuser <user_id> - Remove user from whitelist`;
+/removeuser <user_id> - Remove user from whitelist
+/mcphealth - Check MCP server health`;
   }
 
   helpText += `
@@ -164,6 +165,40 @@ bot.command('tools', checkWhitelist, async (ctx) => {
   } catch (error) {
     logger.error('Error listing tools:', error);
     ctx.reply('❌ Failed to list available tools.');
+  }
+});
+
+bot.command('mcphealth', checkAdmin, async (ctx) => {
+  try {
+    const mcpManager = require('./services/mcpManager');
+    await mcpManager.initialize();
+    
+    const health = await mcpManager.checkHealth();
+    
+    let message = '🏥 MCP Server Health:\n\n';
+    
+    for (const [server, status] of Object.entries(health)) {
+      const emoji = status.status === 'healthy' ? '✅' : '❌';
+      message += `${emoji} ${server}\n`;
+      message += `  Status: ${status.status}\n`;
+      message += `  Connected: ${status.connected ? 'Yes' : 'No'}\n`;
+      message += `  Tools: ${status.toolCount || 0}\n`;
+      
+      if (status.error) {
+        message += `  Error: ${status.error}\n`;
+      }
+      
+      if (status.registry) {
+        message += `  Registry: ${status.registry.healthy ? 'Healthy' : 'Unhealthy'}\n`;
+      }
+      
+      message += '\n';
+    }
+    
+    ctx.reply(message);
+  } catch (error) {
+    logger.error('Error checking MCP health:', error);
+    ctx.reply('❌ Failed to check MCP server health.');
   }
 });
 
