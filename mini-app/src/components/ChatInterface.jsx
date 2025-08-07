@@ -142,7 +142,7 @@ const ChatInterface = ({ userId }) => {
         )}
         <div className="header-content">
           <div className="header-avatar">
-            <span className="avatar-text">CBO-Bro</span>
+            <span className="avatar-text">CBO</span>
           </div>
           <div className="header-info">
             <div className="header-title">
