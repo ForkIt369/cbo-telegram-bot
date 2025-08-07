@@ -15,9 +15,7 @@ const MessageList = ({ messages }) => {
           className={`message ${message.role}`}
         >
           {message.role === 'assistant' && (
-            <div className="message-avatar assistant-avatar">
-              <span className="avatar-text-small">CBO</span>
-            </div>
+            <img src="/cbo-character.png" alt="CBO" className="message-avatar assistant-avatar" />
           )}
           
           <Card className="message-content">

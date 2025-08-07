@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8082:8082"
+      - "8084:8084"
+    environment:
+      - TELEGRAM_BOT_TOKEN=8040936127:AAEfiJL_RkauBa_fLa1JmY9L-xPsDVYTuQM
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - REDIS_URL=redis://redis:6379
+      - NODE_ENV=production
+      - PORT=8082
+      - WS_PORT=8084
+      - APP_URL=${APP_URL}
+      - ALLOWED_ORIGINS=https://t.me,http://localhost:3000
+    volumes:
+      - ../server:/app/server
+      - ../src:/app/src
+    depends_on:
+      - redis
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  ngrok:
+    image: ngrok/ngrok:alpine
+    command: http backend:8082 --authtoken=30w1OkKeTHta0xvB3QbRqjTqwmr_3uzsQxxtHi3BRBDsjqxdV --log=stdout
+    ports:
+      - "4040:4040"
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  frontend:
+    image: nginx:alpine
+    ports:
+      - "3000:80"
+    volumes:
+      - ../src:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - app-network
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  redis-data:

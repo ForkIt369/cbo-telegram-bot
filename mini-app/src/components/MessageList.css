@@ -49,8 +49,10 @@
 }
 
 .assistant-avatar {
-  background: linear-gradient(135deg, var(--cbo-primary) 0%, var(--cbo-secondary) 100%);
+  background: rgba(48, 209, 88, 0.1);
+  padding: 2px;
   box-shadow: 0 0 15px var(--cbo-glow);
+  object-fit: contain;
 }
 
 .user-avatar {

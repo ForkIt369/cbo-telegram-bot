@@ -7,6 +7,7 @@ import winston from 'winston';
 import { ClaudeService } from './services/claude.js';
 import { WebSocketHandler } from './websocket/handler.js';
 import { SessionManager } from './websocket/sessions.js';
+import { TelegramWebhook } from './telegram-webhook.js';
 
 dotenv.config();
 
@@ -70,9 +71,26 @@ wss.on('error', (error) => {
   logger.error('WebSocket server error:', error);
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, async () => {
   logger.info(`Server running on port ${PORT}`);
   logger.info(`WebSocket server running on port ${WS_PORT}`);
+  
+  // Setup Telegram webhook if configured
+  if (process.env.TELEGRAM_BOT_TOKEN && process.env.APP_URL) {
+    try {
+      const telegram = new TelegramWebhook(
+        process.env.TELEGRAM_BOT_TOKEN,
+        process.env.APP_URL,
+        logger
+      );
+      await telegram.setupWebhook(app);
+      logger.info('Telegram webhook configured successfully');
+    } catch (error) {
+      logger.error('Failed to setup Telegram webhook:', error);
+    }
+  } else if (process.env.TELEGRAM_BOT_TOKEN) {
+    logger.info('Telegram bot token found but APP_URL not set - webhook not configured');
+  }
 });
 
 process.on('SIGTERM', () => {

@@ -33,10 +33,19 @@ class ClaudeBROApp {
   }
 
   getWebSocketUrl() {
-    // In production, use wss:// with your domain
+    // Check if running in Telegram Web App
+    if (window.Telegram && window.Telegram.WebApp) {
+      // Use the same host as the current page with WebSocket port
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const host = window.location.hostname;
+      // In production/ngrok, WebSocket runs on same port
+      return `${protocol}//${host}/ws`;
+    }
+    
+    // Local development
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const host = window.location.hostname;
-    const port = host === 'localhost' ? ':8081' : '';
+    const port = host === 'localhost' ? ':8084' : '';
     return `${protocol}//${host}${port}`;
   }
 

@@ -1,6 +1,6 @@
 class ClaudeSDKBridge {
   constructor(config = {}) {
-    this.wsUrl = config.wsUrl || 'ws://localhost:8081';
+    this.wsUrl = config.wsUrl || 'ws://localhost:8084';
     this.sessionId = config.sessionId || this.getOrCreateSessionId();
     this.ws = null;
     this.messageQueue = [];

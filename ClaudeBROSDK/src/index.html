@@ -136,5 +136,26 @@
     <!-- Scripts -->
     <script src="js/websocket.js"></script>
     <script src="js/app.js"></script>
+    <script>
+        // Initialize Telegram Web App if available
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tg = window.Telegram.WebApp;
+            tg.ready();
+            tg.expand();
+            
+            // Set theme colors
+            tg.setHeaderColor('#0D1117');
+            tg.setBackgroundColor('#0D1117');
+            
+            // Auto-start chat if in Telegram
+            setTimeout(() => {
+                const welcomeScreen = document.getElementById('welcomeScreen');
+                const chatContainer = document.getElementById('chatContainer');
+                if (welcomeScreen && chatContainer && welcomeScreen.style.display !== 'none') {
+                    startChat();
+                }
+            }, 500);
+        }
+    </script>
 </body>
 </html>
