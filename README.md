@@ -1,6 +1,6 @@
-# CBO Telegram Bot
+# CBO Telegram Bot & Mini App
 
-A Telegram bot for business optimization consulting powered by Claude Sonnet 4 and the BroVerse Biz Mental Model™ (BBMM).
+A sophisticated Telegram bot and mini-app for business optimization consulting powered by Claude Sonnet 4 and the BroVerse Biz Mental Model™ (BBMM).
 
 ## 🚀 Quick Start
 
@@ -16,25 +16,39 @@ cp .env.example .env
 
 # 3. Run locally
 npm run dev
+
+# 4. Build mini-app
+cd mini-app && npm install && npm run build
 ```
 
-**Status**: ✅ Live in production on DigitalOcean
+**Status**: ✅ Live in production
+- **Bot**: Active on Telegram [@YourBotName]
+- **Mini App**: https://cbo-mcp-system-hs2sx.ondigitalocean.app
 
-## 🤖 What It Does
+## 🎯 What It Does
 
-The CBO Bot helps businesses optimize through Four Flows analysis:
-- 💰 **Value Flow** - Revenue and pricing optimization
-- 📊 **Info Flow** - Data and communication systems
-- ⚙️ **Work Flow** - Process efficiency
-- 💵 **Cash Flow** - Financial health monitoring
+CBO-Bro (the green cube character with glasses) helps businesses optimize through Four Flows analysis:
+- 💎 **Value Flow** - Customer delivery & revenue optimization
+- 📊 **Info Flow** - Data systems & decision-making
+- ⚡ **Work Flow** - Operations & process efficiency
+- 💰 **Cash Flow** - Financial health & liquidity
 
 ## 📱 Features
 
-- **Telegram Bot** - Natural conversation interface
-- **Mini App** - Beautiful web UI within Telegram
-- **AI Analysis** - Powered by Claude Sonnet 4
-- **Memory System** - Remembers context across sessions
-- **Access Control** - Whitelist-based security
+### Telegram Bot
+- **Natural Language Interface** - Chat naturally about business challenges
+- **Context Memory** - Maintains conversation history across sessions
+- **Flow Analysis** - Identifies which of the 4 flows needs attention
+- **Access Control** - Whitelist-based security system
+- **Admin Commands** - User management capabilities
+
+### Mini App (New!)
+- **Modern UI** - Polished glassmorphic design with CBO brand colors
+- **CBO Character** - Features the iconic green cube avatar with glasses
+- **Mobile-First** - Optimized for Telegram's in-app browser
+- **Quick Actions** - Pre-defined prompts for common business challenges
+- **Flow Indicators** - Visual feedback showing which flow is being analyzed
+- **Coming Soon** - Voice input, file uploads, and analytics dashboard
 
 ## 🛠️ Configuration
 
@@ -80,13 +94,30 @@ Configuration: `.do/app.yaml`
 ## 🏗️ Project Structure
 
 ```
-├── src/              # Core bot application
-├── agents/           # CBO business logic
-├── mini-app/         # Telegram Mini App
-├── config/           # Configuration files
-├── docs/             # Documentation
-└── experimental/     # Optional features
+├── src/                 # Core bot application
+│   ├── index.js        # Main bot entry point & Express server
+│   ├── handlers/       # Message & command handlers
+│   └── memory/         # Conversation persistence
+├── agents/             # CBO business logic
+│   └── cbo-agent.js   # Claude Sonnet 4 integration
+├── mini-app/           # Telegram Mini App (React + Vite)
+│   ├── src/           # React components
+│   ├── public/        # Static assets (CBO character PNG)
+│   └── dist/          # Production build
+├── config/            # Configuration files
+├── docs/              # Documentation
+└── demos/             # Demo implementations
 ```
+
+## 🎨 Design System
+
+The app uses the **CBO Brand Design System**:
+- **Primary Color**: #30D158 (Fresh Green)
+- **Secondary Color**: #00C851 (Deep Green)
+- **Dark Theme**: #0D1117 background
+- **Character**: Green cube with glasses (cbo-character.png)
+- **Typography**: Inter, SF Pro Display
+- **Effects**: Glassmorphism, subtle animations
 
 ## 🤝 Contributing
 

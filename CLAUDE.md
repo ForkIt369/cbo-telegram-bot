@@ -8,6 +8,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run dev` - Start bot in development mode with auto-reload (nodemon)
 - `npm start` - Start bot in production mode
 - `npm test` - Run Jest test suite
+- `npm run build` - Build entire project including mini-app
+
+### Mini App Development
+```bash
+cd mini-app
+npm install        # Install dependencies
+npm run dev        # Start development server on port 3002
+npm run build      # Build for production to dist/
+```
 
 ### Environment Setup
 - Copy `.env.example` to `.env` and configure required variables
@@ -16,13 +25,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture Overview
 
-This is a Telegram bot that provides business optimization consulting through the BroVerse Biz Mental Model™ (BBMM) framework, powered by Claude Sonnet 4.
+This is a Telegram bot with an integrated mini-app that provides business optimization consulting through the BroVerse Biz Mental Model™ (BBMM) framework, powered by Claude Sonnet 4.
 
 ### Key Components
 
 1. **Bot Entry Point** (`src/index.js`): Telegraf bot handling commands and messages
    - Webhook mode in production, polling in development
-   - Express server for health checks
+   - Express server for health checks and mini-app serving
+   - Serves mini-app from `/mini-app/dist` in production
 
 2. **CBO Agent Handler** (`src/handlers/cboAgentHandler.js`): Manages conversations and context
    - Maintains conversation state per user
@@ -37,6 +47,13 @@ This is a Telegram bot that provides business optimization consulting through th
 4. **Memory Bank** (`src/memory/memoryBank.js`): File-based storage system
    - Saves conversations, insights, and patterns
    - Provides user history and pattern detection
+
+5. **Mini App** (`mini-app/`): React + Vite Telegram Web App
+   - Modern UI with CBO brand design system
+   - Features CBO character (green cube with glasses)
+   - Mobile-optimized for Telegram's in-app browser
+   - Components: ChatInterface, MessageList, FlowIndicator
+   - Assets: `public/cbo-character.png` - Main character avatar
 
 ### Key Patterns
 

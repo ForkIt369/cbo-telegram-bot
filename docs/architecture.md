@@ -2,7 +2,9 @@
 
 ## System Overview
 
-CBO Bot is a Telegram-based business optimization assistant powered by Claude Sonnet 4, providing strategic insights through the BroVerse Biz Mental Model™ (BBMM) framework. The system analyzes businesses across four key flows: Value, Info, Work, and Cash.
+CBO Bot is a comprehensive Telegram-based business optimization platform featuring both a conversational bot and a modern mini-app interface. Powered by Claude Sonnet 4, it provides strategic insights through the BroVerse Biz Mental Model™ (BBMM) framework, analyzing businesses across four key flows: Value, Info, Work, and Cash.
+
+The system features CBO-Bro, a distinctive green cube character with glasses who serves as the AI business consultant.
 
 ## Architecture Diagram
 
