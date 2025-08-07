@@ -35,13 +35,12 @@
 
 .message-avatar {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
   transition: transform var(--transition-fast);
 }
 
@@ -49,13 +48,14 @@
   transform: scale(1.1);
 }
 
-.message.user .message-avatar {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.assistant-avatar {
+  background: linear-gradient(135deg, var(--cbo-primary) 0%, var(--cbo-secondary) 100%);
+  box-shadow: 0 0 15px var(--cbo-glow);
 }
 
-.message.assistant .message-avatar {
-  background: linear-gradient(135deg, var(--cbo-primary) 0%, var(--cbo-secondary) 100%);
-  box-shadow: 0 0 20px var(--cbo-glow);
+.user-avatar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-size: 1rem;
 }
 
 .message-content {

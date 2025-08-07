@@ -15,12 +15,9 @@ const MessageList = ({ messages }) => {
           className={`message ${message.role}`}
         >
           {message.role === 'assistant' && (
-            <Avatar 
-              size={32} 
-              className="message-avatar"
-            >
-              <span className="avatar-emoji">🎯</span>
-            </Avatar>
+            <div className="message-avatar assistant-avatar">
+              <span className="avatar-text-small">CBO</span>
+            </div>
           )}
           
           <Card className="message-content">
@@ -33,9 +30,9 @@ const MessageList = ({ messages }) => {
           </Card>
           
           {message.role === 'user' && (
-            <Avatar size={32} className="message-avatar">
+            <div className="message-avatar user-avatar">
               <span>👤</span>
-            </Avatar>
+            </div>
           )}
         </motion.div>
       ))}

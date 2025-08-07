@@ -141,13 +141,9 @@ const ChatInterface = ({ userId }) => {
           </button>
         )}
         <div className="header-content">
-          <Avatar 
-            size={36}
-            alt="CBO-Bro"
-            className="header-avatar"
-          >
-            <span className="cbo-emoji">🎯</span>
-          </Avatar>
+          <div className="header-avatar">
+            <span className="avatar-text">CBO-Bro</span>
+          </div>
           <div className="header-info">
             <div className="header-title">
               CBO-Bro
@@ -169,7 +165,8 @@ const ChatInterface = ({ userId }) => {
               className="welcome-message"
             >
               <div className="welcome-avatar">
-                <span className="cbo-emoji-large">🎯</span>
+                <span className="avatar-text-large">CBO-Bro</span>
+                <span className="avatar-question">?</span>
               </div>
               
               <h1 className="welcome-title">CBO-Bro</h1>
