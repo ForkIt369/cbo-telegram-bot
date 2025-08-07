@@ -18,9 +18,9 @@ const MessageList = ({ messages }) => {
             <Avatar 
               size={32} 
               className="message-avatar"
-              src="/cbo-avatar.svg"
-              fallbackIcon={<span>💼</span>}
-            />
+            >
+              <span className="avatar-emoji">🎯</span>
+            </Avatar>
           )}
           
           <Card className="message-content">

@@ -127,20 +127,34 @@ const ChatInterface = ({ userId }) => {
   return (
     <div className="chat-interface">
       <header className="chat-header">
-        <Avatar 
-          src="/cbo-avatar.svg" 
-          size={40}
-          alt="CBO-Bro"
-          fallbackIcon={
-            <div className="avatar-fallback">CBO</div>
-          }
-        />
-        <div className="header-info">
-          <div className="header-title">
-            CBO-Bro Assistant
-            <span className="status-badge">AI Powered</span>
+        {messages.length > 0 && (
+          <button 
+            className="back-btn"
+            onClick={() => {
+              clearChat();
+              setShowWelcome(true);
+              setInputMessage('');
+            }}
+            aria-label="Back to welcome"
+          >
+            ←
+          </button>
+        )}
+        <div className="header-content">
+          <Avatar 
+            size={36}
+            alt="CBO-Bro"
+            className="header-avatar"
+          >
+            <span className="cbo-emoji">🎯</span>
+          </Avatar>
+          <div className="header-info">
+            <div className="header-title">
+              CBO-Bro
+              <span className="status-badge">AI Powered</span>
+            </div>
+            <Caption>Business Optimization Expert</Caption>
           </div>
-          <Caption>Business Optimization Expert</Caption>
         </div>
         <FlowIndicator activeFlow={activeFlow} />
       </header>
@@ -155,10 +169,10 @@ const ChatInterface = ({ userId }) => {
               className="welcome-message"
             >
               <div className="welcome-avatar">
-                <img src="/cbo-avatar.png" alt="CBO-Bro" />
+                <span className="cbo-emoji-large">🎯</span>
               </div>
               
-              <h1 className="welcome-title">Chief Bro Officer</h1>
+              <h1 className="welcome-title">CBO-Bro</h1>
               <p className="welcome-subtitle">Your AI Business Optimization Expert</p>
               
               <div className="features-grid">
@@ -189,25 +203,25 @@ const ChatInterface = ({ userId }) => {
                   className="quick-action"
                   onClick={() => handleQuickAction("How can I improve customer retention?")}
                 >
-                  📈 Customer Retention
+                  Customer Retention
                 </button>
                 <button
                   className="quick-action"
-                  onClick={() => handleQuickAction("My cash flow is tight, what should I do?")}
+                  onClick={() => handleQuickAction("Analyze my cash flow")}
                 >
-                  💰 Cash Flow Help
+                  Cash Flow
                 </button>
                 <button
                   className="quick-action"
-                  onClick={() => handleQuickAction("Need to optimize my operations")}
+                  onClick={() => handleQuickAction("Optimize operations")}
                 >
-                  ⚙️ Operations
+                  Operations
                 </button>
                 <button
                   className="quick-action"
-                  onClick={() => handleQuickAction("How do I scale my business?")}
+                  onClick={() => handleQuickAction("Scale my business")}
                 >
-                  🚀 Scale Business
+                  Scale Up
                 </button>
               </div>
             </motion.div>
@@ -222,24 +236,7 @@ const ChatInterface = ({ userId }) => {
       </div>
 
       <div className="chat-input-container">
-        <div className="input-actions">
-          <button 
-            className="attach-btn coming-soon tooltip" 
-            data-tooltip="File attachments coming soon!"
-            disabled
-          >
-            📎
-          </button>
-          <button 
-            className="voice-btn coming-soon tooltip" 
-            data-tooltip="Voice input coming soon!"
-            disabled
-          >
-            🎤
-          </button>
-        </div>
-        
-        <div className="message-input-wrapper">
+        <div className="input-wrapper">
           <input
             ref={inputRef}
             type="text"
@@ -250,15 +247,17 @@ const ChatInterface = ({ userId }) => {
             placeholder="Ask about your business..."
             disabled={isLoading}
           />
+          <button
+            className="send-btn"
+            onClick={handleSend}
+            disabled={!inputMessage.trim() || isLoading}
+          >
+            {isLoading ? '...' : '→'}
+          </button>
         </div>
-        
-        <button
-          className="send-btn"
-          onClick={handleSend}
-          disabled={!inputMessage.trim() || isLoading}
-        >
-          {isLoading ? '...' : '→'}
-        </button>
+        <div className="coming-soon-bar">
+          <span className="coming-soon-text">Coming Soon: Voice • Files • Analytics</span>
+        </div>
       </div>
     </div>
   );
