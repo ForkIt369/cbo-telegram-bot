@@ -6,7 +6,9 @@ import {
   Spinner,
   Avatar,
   Text,
-  Caption
+  Caption,
+  Title,
+  Subheadline
 } from '@telegram-apps/telegram-ui';
 import MessageList from './MessageList';
 import TypingIndicator from './TypingIndicator';
@@ -18,6 +20,7 @@ const ChatInterface = ({ userId }) => {
   const [inputMessage, setInputMessage] = useState('');
   const [authorized, setAuthorized] = useState(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(true);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   
@@ -56,6 +59,13 @@ const ChatInterface = ({ userId }) => {
     }
   }, [userId]);
 
+  // Hide welcome screen when messages exist
+  useEffect(() => {
+    if (messages.length > 0) {
+      setShowWelcome(false);
+    }
+  }, [messages]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -69,6 +79,7 @@ const ChatInterface = ({ userId }) => {
     
     const message = inputMessage;
     setInputMessage('');
+    setShowWelcome(false);
     await sendMessage(message);
     inputRef.current?.focus();
   };
@@ -78,6 +89,12 @@ const ChatInterface = ({ userId }) => {
       e.preventDefault();
       handleSend();
     }
+  };
+
+  const handleQuickAction = (message) => {
+    setInputMessage(message);
+    setShowWelcome(false);
+    setTimeout(() => inputRef.current?.focus(), 100);
   };
 
   // Show loading while checking auth
@@ -113,13 +130,16 @@ const ChatInterface = ({ userId }) => {
         <Avatar 
           src="/cbo-avatar.svg" 
           size={40}
-          alt="CBO-Bro - Business Optimization Expert"
+          alt="CBO-Bro"
           fallbackIcon={
-            <div className="avatar-fallback">💼</div>
+            <div className="avatar-fallback">CBO</div>
           }
         />
         <div className="header-info">
-          <Text weight="2">CBO-Bro Assistant</Text>
+          <div className="header-title">
+            CBO-Bro Assistant
+            <span className="status-badge">AI Powered</span>
+          </div>
           <Caption>Business Optimization Expert</Caption>
         </div>
         <FlowIndicator activeFlow={activeFlow} />
@@ -127,55 +147,74 @@ const ChatInterface = ({ userId }) => {
 
       <div className="chat-messages">
         <AnimatePresence>
-          {messages.length === 0 && (
+          {showWelcome && messages.length === 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
+              exit={{ opacity: 0, y: -20 }}
               className="welcome-message"
             >
               <div className="welcome-avatar">
-                <Avatar 
-                  size={80}
-                  src="/cbo-avatar.svg"
-                  fallbackIcon={
-                    <span style={{ fontSize: '40px' }}>💼</span>
-                  }
-                />
+                <img src="/cbo-avatar.png" alt="CBO-Bro" />
               </div>
-              <Text weight="2">Welcome to CBO-Bro!</Text>
-              <Caption>
-                I analyze businesses through 4 key flows:
-                Value, Info, Work & Cash
-              </Caption>
+              
+              <h1 className="welcome-title">Chief Bro Officer</h1>
+              <p className="welcome-subtitle">Your AI Business Optimization Expert</p>
+              
+              <div className="features-grid">
+                <div className="feature-card">
+                  <span className="feature-icon">💎</span>
+                  <div className="feature-title">Value Flow</div>
+                  <div className="feature-desc">Customer delivery</div>
+                </div>
+                <div className="feature-card">
+                  <span className="feature-icon">📊</span>
+                  <div className="feature-title">Info Flow</div>
+                  <div className="feature-desc">Data & decisions</div>
+                </div>
+                <div className="feature-card">
+                  <span className="feature-icon">⚡</span>
+                  <div className="feature-title">Work Flow</div>
+                  <div className="feature-desc">Operations</div>
+                </div>
+                <div className="feature-card">
+                  <span className="feature-icon">💰</span>
+                  <div className="feature-title">Cash Flow</div>
+                  <div className="feature-desc">Financial health</div>
+                </div>
+              </div>
+              
               <div className="quick-actions">
-                <Button
-                  size="s"
-                  mode="outline"
-                  onClick={() => setInputMessage("How can I improve customer retention?")}
+                <button
+                  className="quick-action"
+                  onClick={() => handleQuickAction("How can I improve customer retention?")}
                 >
-                  Customer Retention
-                </Button>
-                <Button
-                  size="s"
-                  mode="outline"
-                  onClick={() => setInputMessage("My cash flow is tight")}
+                  📈 Customer Retention
+                </button>
+                <button
+                  className="quick-action"
+                  onClick={() => handleQuickAction("My cash flow is tight, what should I do?")}
                 >
-                  Cash Flow Help
-                </Button>
-                <Button
-                  size="s"
-                  mode="outline"
-                  onClick={() => setInputMessage("Need to optimize operations")}
+                  💰 Cash Flow Help
+                </button>
+                <button
+                  className="quick-action"
+                  onClick={() => handleQuickAction("Need to optimize my operations")}
                 >
-                  Operations
-                </Button>
+                  ⚙️ Operations
+                </button>
+                <button
+                  className="quick-action"
+                  onClick={() => handleQuickAction("How do I scale my business?")}
+                >
+                  🚀 Scale Business
+                </button>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        <MessageList messages={messages} />
+        {!showWelcome && <MessageList messages={messages} />}
         
         {isLoading && <TypingIndicator />}
         
@@ -183,24 +222,43 @@ const ChatInterface = ({ userId }) => {
       </div>
 
       <div className="chat-input-container">
-        <Input
-          ref={inputRef}
-          value={inputMessage}
-          onChange={(e) => setInputMessage(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="Ask about your business..."
-          disabled={isLoading}
-          after={
-            <Button
-              size="s"
-              mode="plain"
-              onClick={handleSend}
-              disabled={!inputMessage.trim() || isLoading}
-            >
-              {isLoading ? <Spinner size="s" /> : '→'}
-            </Button>
-          }
-        />
+        <div className="input-actions">
+          <button 
+            className="attach-btn coming-soon tooltip" 
+            data-tooltip="File attachments coming soon!"
+            disabled
+          >
+            📎
+          </button>
+          <button 
+            className="voice-btn coming-soon tooltip" 
+            data-tooltip="Voice input coming soon!"
+            disabled
+          >
+            🎤
+          </button>
+        </div>
+        
+        <div className="message-input-wrapper">
+          <input
+            ref={inputRef}
+            type="text"
+            className="message-input"
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Ask about your business..."
+            disabled={isLoading}
+          />
+        </div>
+        
+        <button
+          className="send-btn"
+          onClick={handleSend}
+          disabled={!inputMessage.trim() || isLoading}
+        >
+          {isLoading ? '...' : '→'}
+        </button>
       </div>
     </div>
   );
