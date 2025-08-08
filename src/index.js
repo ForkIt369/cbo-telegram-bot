@@ -61,6 +61,7 @@ bot.help(checkWhitelist, (ctx) => {
     helpText += `
 
 Admin Commands:
+/admin - Open admin panel dashboard
 /whitelist - Show whitelisted users
 /adduser <user_id> [notes] - Add user to whitelist
 /removeuser <user_id> - Remove user from whitelist`;
@@ -89,6 +90,26 @@ Uptime: ${process.uptime()}s`);
 bot.command('clear', checkWhitelist, async (ctx) => {
   await cboHandler.clearContext(ctx.from.id);
   ctx.reply('Conversation context cleared. Fresh start! 🔄');
+});
+
+// Admin panel command
+bot.command('admin', checkAdmin, async (ctx) => {
+  const adminUrl = process.env.WEBHOOK_URL || 'https://cbo-mcp-system-hs2sx.ondigitalocean.app';
+  
+  await ctx.reply(
+    '🔐 *Admin Panel Access*\n\n' +
+    'Click the link below to open the admin dashboard:\n\n' +
+    `${adminUrl}/admin/login\n\n` +
+    '_This link will open in Telegram browser where you can use Admin Quick Access_',
+    { 
+      parse_mode: 'Markdown',
+      reply_markup: {
+        inline_keyboard: [[
+          { text: '🚀 Open Admin Panel', url: `${adminUrl}/admin/login` }
+        ]]
+      }
+    }
+  );
 });
 
 // Admin commands
