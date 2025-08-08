@@ -4,10 +4,15 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { createServer } from 'http';
 import winston from 'winston';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { ClaudeService } from './services/claude.js';
 import { WebSocketHandler } from './websocket/handler.js';
 import { SessionManager } from './websocket/sessions.js';
 import { TelegramWebhook } from './telegram-webhook.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -26,14 +31,23 @@ const logger = winston.createLogger({
 
 const app = express();
 const server = createServer(app);
-const PORT = process.env.PORT || 8080;
-const WS_PORT = process.env.WS_PORT || 8081;
+const PORT = process.env.PORT || 8082;
+const WS_PORT = process.env.WS_PORT || 8084;
 
 app.use(cors({
   origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
   credentials: true
 }));
 app.use(express.json());
+
+// Serve static frontend files
+const frontendPath = path.join(__dirname, '..', 'src');
+app.use(express.static(frontendPath));
+
+// Serve index.html for root path
+app.get('/', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
+});
 
 app.get('/health', (req, res) => {
   res.json({ 
@@ -52,7 +66,8 @@ app.get('/api/status', (req, res) => {
   });
 });
 
-const wss = new WebSocketServer({ port: WS_PORT });
+// Create WebSocket server on the same HTTP server
+const wss = new WebSocketServer({ server, path: '/ws' });
 
 const claudeService = new ClaudeService(process.env.ANTHROPIC_API_KEY);
 const sessionManager = new SessionManager();
@@ -73,7 +88,7 @@ wss.on('error', (error) => {
 
 server.listen(PORT, async () => {
   logger.info(`Server running on port ${PORT}`);
-  logger.info(`WebSocket server running on port ${WS_PORT}`);
+  logger.info(`WebSocket available at ws://localhost:${PORT}/ws`);
   
   // Setup Telegram webhook if configured
   if (process.env.TELEGRAM_BOT_TOKEN && process.env.APP_URL) {

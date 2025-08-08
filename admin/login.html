@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBO Admin - Login</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="https://telegram.org/js/telegram-widget.js?22"></script>
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <img src="/cbo-character.png" alt="CBO" class="login-logo">
+                <h1>CBO Admin Panel</h1>
+                <p class="login-subtitle">Chief Business Optimization Control Center</p>
+            </div>
+            
+            <div class="login-content">
+                <div class="login-info">
+                    <p>Sign in with your Telegram account to access the admin panel.</p>
+                    <p class="login-note">Admin access required</p>
+                </div>
+                
+                <!-- Telegram Login Widget -->
+                <div class="telegram-login-container">
+                    <script async src="https://telegram.org/js/telegram-widget.js?22" 
+                            data-telegram-login="cbo_bro_bot"
+                            data-size="large"
+                            data-onauth="onTelegramAuth(user)"
+                            data-request-access="write">
+                    </script>
+                </div>
+                
+                <div class="login-error" id="loginError" style="display: none;">
+                    <span class="error-icon">⚠️</span>
+                    <span id="errorMessage">Access denied. Admin privileges required.</span>
+                </div>
+            </div>
+            
+            <div class="login-footer">
+                <p>Authorized Admins Only</p>
+                <div class="admin-badges">
+                    <span class="admin-badge">@W3_DV</span>
+                    <span class="admin-badge">@properukrainian</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/telegram-auth.js"></script>
+</body>
+</html>

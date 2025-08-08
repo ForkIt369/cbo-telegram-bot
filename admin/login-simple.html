@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBO Admin - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0d1117 0%, #1c2128 100%);
+            color: #c9d1d9;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: rgba(22, 27, 34, 0.95);
+            border: 1px solid rgba(48, 209, 88, 0.3);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, #30D158 0%, #00C851 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 4px 12px rgba(48, 209, 88, 0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #30D158;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #8b949e;
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+        
+        .section {
+            margin-bottom: 24px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            color: #c9d1d9;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        
+        .info-box {
+            background: rgba(248, 81, 73, 0.1);
+            border: 1px solid rgba(248, 81, 73, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .info-box h3 {
+            color: #f85149;
+            font-size: 16px;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        
+        .info-box p {
+            color: #c9d1d9;
+            font-size: 14px;
+            line-height: 1.5;
+            text-align: center;
+            margin: 8px 0;
+        }
+        
+        .user-id {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            text-align: center;
+            margin: 12px 0;
+        }
+        
+        .user-id span {
+            color: #30D158;
+            font-weight: 500;
+        }
+        
+        .telegram-widget {
+            display: flex;
+            justify-content: center;
+            margin: 24px 0;
+            min-height: 48px;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #8b949e;
+            font-size: 14px;
+        }
+        
+        .divider {
+            text-align: center;
+            margin: 24px 0;
+            position: relative;
+            color: #6e7681;
+            font-size: 12px;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: calc(50% - 30px);
+            height: 1px;
+            background: rgba(48, 54, 61, 0.5);
+        }
+        
+        .divider::before {
+            left: 0;
+        }
+        
+        .divider::after {
+            right: 0;
+        }
+        
+        .dev-section {
+            margin-top: 24px;
+        }
+        
+        .dev-note {
+            text-align: center;
+            color: #8b949e;
+            font-size: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px 20px;
+            margin-bottom: 12px;
+            background: rgba(48, 209, 88, 0.1);
+            border: 1px solid rgba(48, 209, 88, 0.3);
+            color: #30D158;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .btn:hover {
+            background: rgba(48, 209, 88, 0.2);
+            border-color: #30D158;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(48, 209, 88, 0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .footer {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(48, 54, 61, 0.5);
+            text-align: center;
+        }
+        
+        .footer p {
+            color: #8b949e;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+        
+        .admin-list {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .admin-name {
+            background: rgba(48, 209, 88, 0.15);
+            color: #30D158;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            border: 1px solid rgba(48, 209, 88, 0.3);
+        }
+        
+        .error-msg {
+            color: #f85149;
+            text-align: center;
+            margin-top: 12px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .success-msg {
+            color: #30D158;
+            text-align: center;
+            margin-top: 12px;
+            font-size: 14px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">CBO</div>
+        <h1>CBO Admin Panel</h1>
+        <p class="subtitle">Business Optimization Control Center</p>
+        
+        <div class="info-box">
+            <h3>Access Restricted</h3>
+            <p>This Mini App is for authorized users only.</p>
+            <div class="user-id">
+                Your User ID: <span id="userId">Not detected</span>
+            </div>
+            <p style="font-size: 13px; color: #8b949e;">Please contact the administrator for access.</p>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Sign in with Telegram</div>
+            <div id="telegram-widget" class="telegram-widget">
+                <div class="loading">Loading Telegram login...</div>
+            </div>
+        </div>
+        
+        <div class="divider">OR</div>
+        
+        <div class="dev-section" id="devLogin">
+            <p class="dev-note">Development Access (localhost only)</p>
+            <button class="btn" onclick="devLogin(359511525, 'W3_DV')">Login as W3_DV (Admin)</button>
+            <button class="btn" onclick="devLogin(224668466, 'Sasha')">Login as Sasha (Admin)</button>
+        </div>
+        
+        <div id="errorMsg" class="error-msg"></div>
+        <div id="successMsg" class="success-msg"></div>
+        
+        <div class="footer">
+            <p>Authorized Administrators</p>
+            <div class="admin-list">
+                <span class="admin-name">@W3_DV</span>
+                <span class="admin-name">@properukrainian</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Check if we're in Telegram WebApp
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tgUser = window.Telegram.WebApp.initDataUnsafe.user;
+            if (tgUser && tgUser.id) {
+                document.getElementById('userId').textContent = tgUser.id;
+            }
+        }
+        
+        // Hide dev login in production
+        if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+            document.getElementById('devLogin').style.display = 'none';
+        }
+        
+        // Development login
+        async function devLogin(userId, name) {
+            try {
+                showMessage('Logging in...', 'success');
+                
+                const response = await fetch('/api/admin/auth', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: userId,
+                        first_name: name,
+                        username: userId === 359511525 ? 'W3_DV' : 'properukrainian',
+                        hash: 'dev-hash',
+                        auth_date: Math.floor(Date.now() / 1000)
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.token) {
+                    localStorage.setItem('adminToken', data.token);
+                    localStorage.setItem('adminUser', JSON.stringify(data.user));
+                    showMessage('Login successful! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/admin/';
+                    }, 1000);
+                } else {
+                    showMessage(data.error || 'Login failed', 'error');
+                }
+            } catch (error) {
+                showMessage('Connection error: ' + error.message, 'error');
+            }
+        }
+        
+        // Telegram auth callback
+        function onTelegramAuth(user) {
+            showMessage('Authenticating...', 'success');
+            
+            fetch('/api/admin/auth', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(user)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.token) {
+                    localStorage.setItem('adminToken', data.token);
+                    localStorage.setItem('adminUser', JSON.stringify(data.user));
+                    showMessage('Login successful! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/admin/';
+                    }, 1000);
+                } else {
+                    showMessage(data.error || 'Authentication failed', 'error');
+                }
+            })
+            .catch(error => {
+                showMessage('Connection error: ' + error.message, 'error');
+            });
+        }
+        
+        // Show message helper
+        function showMessage(msg, type) {
+            const errorEl = document.getElementById('errorMsg');
+            const successEl = document.getElementById('successMsg');
+            
+            errorEl.style.display = 'none';
+            successEl.style.display = 'none';
+            
+            if (type === 'error') {
+                errorEl.textContent = msg;
+                errorEl.style.display = 'block';
+            } else {
+                successEl.textContent = msg;
+                successEl.style.display = 'block';
+            }
+        }
+        
+        // Load Telegram widget
+        window.onload = function() {
+            const script = document.createElement('script');
+            script.src = 'https://telegram.org/js/telegram-widget.js?22';
+            script.async = true;
+            script.setAttribute('data-telegram-login', 'cbo_bro_bot');
+            script.setAttribute('data-size', 'large');
+            script.setAttribute('data-onauth', 'onTelegramAuth(user)');
+            script.setAttribute('data-request-access', 'write');
+            
+            const container = document.getElementById('telegram-widget');
+            container.innerHTML = '';
+            container.appendChild(script);
+        };
+    </script>
+</body>
+</html>

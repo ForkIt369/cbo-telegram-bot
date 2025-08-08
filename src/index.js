@@ -4,10 +4,14 @@ if (process.env.NODE_ENV !== 'production') {
 const { Telegraf } = require('telegraf');
 const express = require('express');
 const path = require('path');
+const crypto = require('crypto');
+const fs = require('fs').promises;
+const jwt = require('jsonwebtoken');
 const logger = require('./utils/logger');
 const CBOAgentHandler = require('./handlers/cboAgentHandler');
 const { checkWhitelist, checkApiAccess, checkAdmin } = require('./middleware/accessControl');
 const whitelistService = require('./services/whitelistService');
+const configService = require('./services/configService');
 
 // Validate required environment variables
 if (!process.env.TELEGRAM_BOT_TOKEN) {
@@ -338,6 +342,278 @@ app.post('/api/auth/check', async (req, res) => {
     logger.error('Error checking access:', error);
     res.status(500).json({ error: 'Failed to check access' });
   }
+});
+
+// Admin Panel Routes
+
+// Admin authentication middleware
+const adminAuth = async (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
+  
+  try {
+    const secret = process.env.JWT_SECRET || 'cbo-admin-secret-key-2025';
+    const decoded = jwt.verify(token, secret);
+    
+    // Verify admin status
+    if (!whitelistService.isAdmin(decoded.userId)) {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+    
+    req.admin = decoded;
+    next();
+  } catch (error) {
+    logger.error('Admin auth error:', error);
+    res.status(401).json({ error: 'Invalid token' });
+  }
+};
+
+// Verify Telegram auth data
+function verifyTelegramAuth(authData) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const secret = crypto.createHash('sha256').update(token).digest();
+  
+  const checkString = Object.keys(authData)
+    .filter(key => key !== 'hash')
+    .sort()
+    .map(key => `${key}=${authData[key]}`)
+    .join('\n');
+  
+  const hash = crypto
+    .createHmac('sha256', secret)
+    .update(checkString)
+    .digest('hex');
+  
+  return hash === authData.hash;
+}
+
+// Telegram authentication endpoint
+app.post('/api/admin/auth', async (req, res) => {
+  const { id, first_name, username, hash, auth_date } = req.body;
+  
+  // For development, skip hash verification
+  const isDev = process.env.NODE_ENV !== 'production';
+  
+  // Verify Telegram hash in production
+  if (!isDev && !verifyTelegramAuth(req.body)) {
+    return res.status(401).json({ error: 'Invalid authentication' });
+  }
+  
+  // Check admin status
+  if (!whitelistService.isAdmin(id)) {
+    logger.warn(`Non-admin user ${id} (${username}) attempted admin access`);
+    return res.status(403).json({ error: 'Admin access required' });
+  }
+  
+  // Generate JWT token
+  const secret = process.env.JWT_SECRET || 'cbo-admin-secret-key-2025';
+  const token = jwt.sign(
+    { userId: id, username, first_name },
+    secret,
+    { expiresIn: '24h' }
+  );
+  
+  logger.info(`Admin ${username} (${id}) logged in`);
+  
+  res.json({ 
+    token, 
+    user: { id, username, first_name } 
+  });
+});
+
+// Get configuration
+app.get('/api/admin/config', adminAuth, async (req, res) => {
+  try {
+    const config = await configService.getActiveConfig();
+    res.json(config);
+  } catch (error) {
+    logger.error('Error getting config:', error);
+    res.status(500).json({ error: 'Failed to get configuration' });
+  }
+});
+
+// Save configuration
+app.post('/api/admin/config', adminAuth, async (req, res) => {
+  try {
+    const config = req.body;
+    await configService.saveConfig(config);
+    
+    // Reload agent with new config
+    await cboHandler.reloadConfig(config);
+    
+    logger.info(`Configuration updated by ${req.admin.username}`);
+    res.json({ success: true });
+  } catch (error) {
+    logger.error('Error saving config:', error);
+    res.status(500).json({ error: 'Failed to save configuration' });
+  }
+});
+
+// Get prompt
+app.get('/api/admin/prompt', adminAuth, async (req, res) => {
+  try {
+    const config = await configService.getActiveConfig();
+    res.json({ prompt: config.system_prompt });
+  } catch (error) {
+    logger.error('Error getting prompt:', error);
+    res.status(500).json({ error: 'Failed to get prompt' });
+  }
+});
+
+// Save prompt
+app.post('/api/admin/prompt', adminAuth, async (req, res) => {
+  try {
+    const { prompt } = req.body;
+    await configService.updatePrompt(prompt);
+    
+    logger.info(`Prompt updated by ${req.admin.username}`);
+    res.json({ success: true });
+  } catch (error) {
+    logger.error('Error saving prompt:', error);
+    res.status(500).json({ error: 'Failed to save prompt' });
+  }
+});
+
+// Test configuration
+app.post('/api/admin/test', adminAuth, async (req, res) => {
+  try {
+    const { message, config } = req.body;
+    const startTime = Date.now();
+    
+    // Use test config temporarily
+    const response = await cboHandler.processWithConfig(message, config);
+    
+    const responseTime = Date.now() - startTime;
+    const tokens = Math.ceil(response.length / 4); // Rough estimate
+    
+    // Detect flow
+    const flow = detectFlow(message);
+    
+    res.json({
+      response,
+      tokens,
+      responseTime,
+      flow
+    });
+  } catch (error) {
+    logger.error('Error testing config:', error);
+    res.status(500).json({ error: 'Test failed: ' + error.message });
+  }
+});
+
+// Helper function to detect flow
+function detectFlow(message) {
+  const text = message.toLowerCase();
+  
+  const flowKeywords = {
+    'Value Flow': ['customer', 'user', 'satisfaction', 'experience', 'retention'],
+    'Info Flow': ['data', 'analytics', 'metrics', 'insights', 'report'],
+    'Work Flow': ['process', 'operation', 'efficiency', 'productivity', 'workflow'],
+    'Cash Flow': ['revenue', 'cost', 'profit', 'financial', 'cash', 'money']
+  };
+  
+  let bestMatch = 'General';
+  let maxScore = 0;
+  
+  for (const [flow, keywords] of Object.entries(flowKeywords)) {
+    const score = keywords.filter(kw => text.includes(kw)).length;
+    if (score > maxScore) {
+      maxScore = score;
+      bestMatch = flow;
+    }
+  }
+  
+  return bestMatch;
+}
+
+// Deployment status
+app.get('/api/admin/deploy/status', adminAuth, async (req, res) => {
+  try {
+    const status = await configService.getDeploymentStatus();
+    res.json(status);
+  } catch (error) {
+    logger.error('Error getting deployment status:', error);
+    res.status(500).json({ error: 'Failed to get deployment status' });
+  }
+});
+
+// Deploy configuration
+app.post('/api/admin/deploy', adminAuth, async (req, res) => {
+  try {
+    const { environment } = req.body;
+    
+    // In production, this would trigger actual deployment
+    // For now, just update the active config
+    await configService.deploy(environment, req.admin.username);
+    
+    logger.info(`Deployment to ${environment} by ${req.admin.username}`);
+    res.json({ 
+      success: true, 
+      message: 'Deployment initiated',
+      environment,
+      version: 'v2.1.0'
+    });
+  } catch (error) {
+    logger.error('Error deploying:', error);
+    res.status(500).json({ error: 'Deployment failed' });
+  }
+});
+
+// Deployment history
+app.get('/api/admin/deploy/history', adminAuth, async (req, res) => {
+  try {
+    const history = await configService.getDeploymentHistory();
+    res.json(history);
+  } catch (error) {
+    logger.error('Error getting deployment history:', error);
+    res.status(500).json({ error: 'Failed to get deployment history' });
+  }
+});
+
+// Analytics stats
+app.get('/api/admin/analytics/stats', adminAuth, async (req, res) => {
+  try {
+    const { range } = req.query;
+    // In production, this would query actual analytics
+    // For now, return mock data
+    res.json({
+      total_queries: 1247,
+      active_users: 42,
+      avg_response_time: 850,
+      success_rate: 98.5
+    });
+  } catch (error) {
+    logger.error('Error getting analytics:', error);
+    res.status(500).json({ error: 'Failed to get analytics' });
+  }
+});
+
+// Flow distribution
+app.get('/api/admin/analytics/flows', adminAuth, async (req, res) => {
+  try {
+    const { range } = req.query;
+    // Mock data for now
+    res.json({
+      value: 312,
+      info: 374,
+      work: 249,
+      cash: 312
+    });
+  } catch (error) {
+    logger.error('Error getting flow distribution:', error);
+    res.status(500).json({ error: 'Failed to get flow distribution' });
+  }
+});
+
+// Serve Admin Panel
+app.use('/admin', express.static(path.join(__dirname, '../admin')));
+
+// Redirect to login page
+app.get('/admin/login', (req, res) => {
+  res.sendFile(path.join(__dirname, '../admin/login-direct.html'));
 });
 
 // Webhook setup MUST come before static file serving

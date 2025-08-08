@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBO Admin Panel</title>
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body onload="checkAuth(); loadDashboard();">
+    <!-- Header -->
+    <header class="admin-header">
+        <div class="header-left">
+            <img src="/cbo-character.png" alt="CBO" class="header-logo">
+            <div class="header-title">
+                <h1>CBO Admin</h1>
+                <span class="header-subtitle">Business Optimization Control</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-info">
+                <span class="user-name" id="userName">Loading...</span>
+                <span class="user-id" id="userId"></span>
+            </div>
+            <button class="btn-logout" onclick="logout()">
+                <span>Logout</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="admin-nav">
+        <button class="tab-btn active" onclick="showTab('config')" data-tab="config">
+            <span class="tab-icon">⚙️</span>
+            <span>Configuration</span>
+        </button>
+        <button class="tab-btn" onclick="showTab('prompt')" data-tab="prompt">
+            <span class="tab-icon">📝</span>
+            <span>Prompt Editor</span>
+        </button>
+        <button class="tab-btn" onclick="showTab('test')" data-tab="test">
+            <span class="tab-icon">🧪</span>
+            <span>Test Console</span>
+        </button>
+        <button class="tab-btn" onclick="showTab('deploy')" data-tab="deploy">
+            <span class="tab-icon">🚀</span>
+            <span>Deploy</span>
+        </button>
+        <button class="tab-btn" onclick="showTab('analytics')" data-tab="analytics">
+            <span class="tab-icon">📊</span>
+            <span>Analytics</span>
+        </button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="admin-content">
+        
+        <!-- Configuration Tab -->
+        <div id="config-tab" class="tab-content active">
+            <div class="tab-header">
+                <h2>Agent Configuration</h2>
+                <button class="btn-secondary" onclick="loadConfig()">Refresh</button>
+            </div>
+            
+            <div class="config-grid">
+                <!-- Model Settings -->
+                <div class="config-card">
+                    <h3>Model Settings</h3>
+                    <div class="form-group">
+                        <label for="provider">AI Provider</label>
+                        <select id="provider" onchange="updateModelOptions()">
+                            <option value="anthropic">Anthropic</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="model">Model</label>
+                        <select id="model">
+                            <option value="claude-3-sonnet-20240229">Claude 3 Sonnet</option>
+                            <option value="claude-3-haiku-20240307">Claude 3 Haiku</option>
+                            <option value="claude-3-opus-20240229">Claude 3 Opus</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="temperature">
+                            Temperature: <span id="tempValue">0.7</span>
+                        </label>
+                        <input type="range" id="temperature" min="0" max="1" step="0.1" value="0.7" 
+                               oninput="document.getElementById('tempValue').textContent = this.value">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="maxTokens">Max Tokens</label>
+                        <input type="number" id="maxTokens" value="1000" min="100" max="4000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="timeout">Timeout (ms)</label>
+                        <input type="number" id="timeout" value="15000" min="5000" max="30000">
+                    </div>
+                </div>
+
+                <!-- Flow Configuration -->
+                <div class="config-card">
+                    <h3>Four Flows Keywords</h3>
+                    <div class="flow-config">
+                        <div class="form-group">
+                            <label>💎 Value Flow</label>
+                            <input type="text" id="valueKeywords" 
+                                   placeholder="customer, user, satisfaction, experience..." 
+                                   value="customer, user, satisfaction, experience, retention, delivery, value">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>📊 Info Flow</label>
+                            <input type="text" id="infoKeywords" 
+                                   placeholder="data, analytics, metrics, insights..." 
+                                   value="data, analytics, metrics, insights, report, information, decision">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>⚙️ Work Flow</label>
+                            <input type="text" id="workKeywords" 
+                                   placeholder="process, operation, efficiency..." 
+                                   value="process, operation, efficiency, productivity, workflow, optimize, performance">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>💰 Cash Flow</label>
+                            <input type="text" id="cashKeywords" 
+                                   placeholder="revenue, cost, profit, financial..." 
+                                   value="revenue, cost, profit, financial, cash, money, budget, investment">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Response Settings -->
+                <div class="config-card">
+                    <h3>Response Settings</h3>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="useMarkdown" checked>
+                            Format responses with markdown
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="includeSources">
+                            Include source references
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label for="responseFormat">Response Format</label>
+                        <select id="responseFormat">
+                            <option value="concise">Concise (< 1000 chars)</option>
+                            <option value="detailed">Detailed</option>
+                            <option value="structured">Structured (with sections)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-bar">
+                <button class="btn-primary" onclick="saveConfig()">
+                    💾 Save Configuration
+                </button>
+                <button class="btn-secondary" onclick="exportConfig()">
+                    📤 Export Config
+                </button>
+                <button class="btn-secondary" onclick="importConfig()">
+                    📥 Import Config
+                </button>
+            </div>
+        </div>
+
+        <!-- Prompt Editor Tab -->
+        <div id="prompt-tab" class="tab-content">
+            <div class="tab-header">
+                <h2>System Prompt Editor</h2>
+                <div class="prompt-actions">
+                    <select id="promptTemplate" onchange="loadTemplate(this.value)">
+                        <option value="">Select template...</option>
+                        <option value="bbmm">BBMM Framework</option>
+                        <option value="sales">Sales Optimization</option>
+                        <option value="support">Customer Support</option>
+                        <option value="technical">Technical Analysis</option>
+                    </select>
+                    <button class="btn-secondary" onclick="formatPrompt()">Format</button>
+                </div>
+            </div>
+            
+            <div class="editor-layout">
+                <div class="editor-main">
+                    <div class="editor-toolbar">
+                        <button onclick="insertVar('{{user_name}}')">User Name</button>
+                        <button onclick="insertVar('{{flow_type}}')">Flow Type</button>
+                        <button onclick="insertVar('{{context}}')">Context</button>
+                        <button onclick="insertVar('{{timestamp}}')">Timestamp</button>
+                        <button onclick="insertVar('{{capabilities}}')">Capabilities</button>
+                    </div>
+                    <textarea id="systemPrompt" class="prompt-editor" placeholder="Enter system prompt..."></textarea>
+                    <div class="editor-status">
+                        <span>Characters: <span id="charCount">0</span></span>
+                        <span>Tokens (est.): <span id="tokenCount">0</span></span>
+                    </div>
+                </div>
+                
+                <div class="editor-sidebar">
+                    <div class="sidebar-section">
+                        <h3>Quick Templates</h3>
+                        <div class="template-list">
+                            <button class="template-btn" onclick="insertTemplate('greeting')">
+                                Greeting
+                            </button>
+                            <button class="template-btn" onclick="insertTemplate('analysis')">
+                                Analysis Framework
+                            </button>
+                            <button class="template-btn" onclick="insertTemplate('action')">
+                                Action Steps
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="sidebar-section">
+                        <h3>Preview</h3>
+                        <div id="promptPreview" class="prompt-preview">
+                            <p>Preview will appear here...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-bar">
+                <button class="btn-primary" onclick="savePrompt()">
+                    💾 Save Prompt
+                </button>
+                <button class="btn-secondary" onclick="testPrompt()">
+                    🧪 Test Prompt
+                </button>
+            </div>
+        </div>
+
+        <!-- Test Console Tab -->
+        <div id="test-tab" class="tab-content">
+            <div class="tab-header">
+                <h2>Test Console</h2>
+                <button class="btn-secondary" onclick="clearTestChat()">Clear Chat</button>
+            </div>
+            
+            <div class="test-layout">
+                <div class="test-chat-container">
+                    <div id="testMessages" class="test-messages">
+                        <div class="test-welcome">
+                            <p>Test your configuration here. Messages sent will use the current unsaved configuration.</p>
+                        </div>
+                    </div>
+                    <div class="test-input-container">
+                        <input type="text" id="testInput" class="test-input" 
+                               placeholder="Type a test message..." 
+                               onkeypress="if(event.key === 'Enter') sendTestMessage()">
+                        <button class="btn-send" onclick="sendTestMessage()">Send</button>
+                    </div>
+                </div>
+                
+                <div class="test-sidebar">
+                    <div class="metrics-card">
+                        <h3>Performance Metrics</h3>
+                        <div class="metric-item">
+                            <span class="metric-label">Response Time:</span>
+                            <span class="metric-value" id="responseTime">-</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Tokens Used:</span>
+                            <span class="metric-value" id="tokenCount">-</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Flow Detected:</span>
+                            <span class="metric-value" id="detectedFlow">-</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Model:</span>
+                            <span class="metric-value" id="testModel">-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="test-examples">
+                        <h3>Example Queries</h3>
+                        <button class="example-btn" onclick="setTestInput('How can I improve customer retention?')">
+                            Customer Retention
+                        </button>
+                        <button class="example-btn" onclick="setTestInput('My cash flow is tight, what should I do?')">
+                            Cash Flow Issues
+                        </button>
+                        <button class="example-btn" onclick="setTestInput('Need to optimize our operations')">
+                            Operations
+                        </button>
+                        <button class="example-btn" onclick="setTestInput('How do I scale my SaaS business?')">
+                            SaaS Scaling
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deploy Tab -->
+        <div id="deploy-tab" class="tab-content">
+            <div class="tab-header">
+                <h2>Deployment Management</h2>
+            </div>
+            
+            <div class="deploy-grid">
+                <div class="deploy-card current">
+                    <h3>Current Production</h3>
+                    <div class="deploy-info">
+                        <div class="info-item">
+                            <span class="info-label">Version:</span>
+                            <span id="currentVersion">v2.0.0</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Deployed:</span>
+                            <span id="deployDate">2025-08-08 14:30 UTC</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Model:</span>
+                            <span id="currentModel">Claude 3 Sonnet</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Status:</span>
+                            <span class="status-badge active">Active</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="deploy-card pending">
+                    <h3>Pending Changes</h3>
+                    <div id="pendingChanges" class="pending-changes">
+                        <p class="no-changes">No pending changes</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="deploy-actions">
+                <button class="btn-warning" onclick="validateConfig()">
+                    ✓ Validate Configuration
+                </button>
+                <button class="btn-primary" onclick="deployProduction()">
+                    🚀 Deploy to Production
+                </button>
+                <button class="btn-secondary" onclick="createBackup()">
+                    💾 Create Backup
+                </button>
+            </div>
+            
+            <div class="deploy-history">
+                <h3>Deployment History</h3>
+                <div id="deployHistory" class="history-list">
+                    <div class="history-item">
+                        <span class="history-version">v2.0.0</span>
+                        <span class="history-date">2025-08-08 14:30</span>
+                        <span class="history-user">@W3_DV</span>
+                        <button class="btn-small" onclick="rollback('v2.0.0')">Rollback</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Tab -->
+        <div id="analytics-tab" class="tab-content">
+            <div class="tab-header">
+                <h2>Usage Analytics</h2>
+                <select id="timeRange" onchange="loadAnalytics(this.value)">
+                    <option value="24h">Last 24 Hours</option>
+                    <option value="7d">Last 7 Days</option>
+                    <option value="30d">Last 30 Days</option>
+                </select>
+            </div>
+            
+            <div class="analytics-grid">
+                <div class="stat-card">
+                    <h3>Total Queries</h3>
+                    <div class="stat-value" id="totalQueries">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Active Users</h3>
+                    <div class="stat-value" id="activeUsers">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Avg Response Time</h3>
+                    <div class="stat-value" id="avgResponse">0ms</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Success Rate</h3>
+                    <div class="stat-value" id="successRate">100%</div>
+                </div>
+            </div>
+            
+            <div class="flow-distribution">
+                <h3>Flow Distribution</h3>
+                <div class="flow-chart">
+                    <div class="flow-bar value-flow" style="width: 25%">
+                        <span>Value: 25%</span>
+                    </div>
+                    <div class="flow-bar info-flow" style="width: 30%">
+                        <span>Info: 30%</span>
+                    </div>
+                    <div class="flow-bar work-flow" style="width: 20%">
+                        <span>Work: 20%</span>
+                    </div>
+                    <div class="flow-bar cash-flow" style="width: 25%">
+                        <span>Cash: 25%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </main>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <p>Processing...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/telegram-auth.js"></script>
+    <script src="js/admin-api.js"></script>
+    <script src="js/config-manager.js"></script>
+    <script src="js/prompt-editor.js"></script>
+    <script src="js/test-console.js"></script>
+    <script src="js/deploy.js"></script>
+    <script src="js/analytics.js"></script>
+</body>
+</html>

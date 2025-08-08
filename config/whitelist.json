@@ -6,7 +6,15 @@
       "first_name": "*W!ll💠🪵",
       "added_date": "2025-08-05",
       "notes": "Main admin user"
+    },
+    {
+      "id": 224668466,
+      "username": "properukrainian",
+      "first_name": "Sasha",
+      "last_name": "Antropov",
+      "added_date": "2025-08-08",
+      "notes": "Admin user"
     }
   ],
-  "admins": [359511525]
+  "admins": [359511525, 224668466]
 }

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBO Admin - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1f2e;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: #232937;
+            border: 2px solid #30D158;
+            border-radius: 20px;
+            padding: 48px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(48, 209, 88, 0.1);
+        }
+        
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 32px;
+            background: linear-gradient(135deg, #30D158 0%, #00C851 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 8px 24px rgba(48, 209, 88, 0.4);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #ffffff;
+            font-size: 32px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #9ca3af;
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+        
+        .alert-box {
+            background: #2d3548;
+            border: 1px solid #4a5568;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 32px;
+        }
+        
+        .alert-title {
+            color: #fbbf24;
+            font-size: 18px;
+            margin-bottom: 12px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .alert-text {
+            color: #e5e7eb;
+            font-size: 15px;
+            line-height: 1.6;
+            text-align: center;
+        }
+        
+        .user-id-box {
+            background: #1a1f2e;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            margin: 16px 0;
+            border: 1px solid #4a5568;
+        }
+        
+        .user-id-label {
+            color: #9ca3af;
+            font-size: 13px;
+        }
+        
+        .user-id-value {
+            color: #30D158;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .section {
+            margin-bottom: 32px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            color: #ffffff;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 16px 24px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #30D158 0%, #00C851 100%);
+            border: none;
+            color: white;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(48, 209, 88, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(48, 209, 88, 0.4);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            width: 100%;
+            padding: 14px 24px;
+            margin-bottom: 12px;
+            background: transparent;
+            border: 2px solid #4a5568;
+            color: #e5e7eb;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: #2d3548;
+            border-color: #30D158;
+            color: #30D158;
+        }
+        
+        .divider {
+            text-align: center;
+            margin: 32px 0;
+            position: relative;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: calc(50% - 40px);
+            height: 1px;
+            background: #4a5568;
+        }
+        
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+        
+        .telegram-info {
+            background: #1e40af;
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .telegram-info p {
+            color: white;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .telegram-info code {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 1px solid #4a5568;
+            text-align: center;
+        }
+        
+        .footer-title {
+            color: #9ca3af;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        
+        .admin-list {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .admin-badge {
+            background: rgba(48, 209, 88, 0.2);
+            color: #30D158;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            border: 1px solid rgba(48, 209, 88, 0.3);
+        }
+        
+        .loading {
+            text-align: center;
+            color: #9ca3af;
+            font-size: 14px;
+            padding: 20px;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(48, 209, 88, 0.3);
+            border-top: 3px solid #30D158;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .message.success {
+            background: rgba(48, 209, 88, 0.2);
+            border: 1px solid #30D158;
+            color: #30D158;
+        }
+        
+        .message.error {
+            background: rgba(248, 113, 113, 0.2);
+            border: 1px solid #f87171;
+            color: #f87171;
+        }
+        
+        .message.show {
+            display: block;
+        }
+        
+        /* Hide elements initially */
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">CBO</div>
+        <h1>CBO Admin Panel</h1>
+        <p class="subtitle">Business Optimization Control Center</p>
+        
+        <div class="alert-box">
+            <div class="alert-title">🔒 Access Restricted</div>
+            <p class="alert-text">This admin panel is for authorized administrators only.</p>
+            <div class="user-id-box">
+                <div class="user-id-label">Your Telegram User ID:</div>
+                <div class="user-id-value" id="userId">Detecting...</div>
+            </div>
+            <p class="alert-text" style="font-size: 13px; color: #9ca3af; margin-top: 12px;">
+                If you need access, share this ID with an administrator.
+            </p>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Login Options</div>
+            
+            <!-- Direct login buttons (always visible) -->
+            <div id="directLogin">
+                <button class="btn-primary" onclick="adminLogin()">
+                    🔐 Admin Quick Access
+                </button>
+                
+                <div class="telegram-info">
+                    <p><strong>Telegram Login</strong></p>
+                    <p>To use Telegram login, open this page from:</p>
+                    <p>Your CBO Bot → Menu → Admin Panel</p>
+                    <p style="font-size: 12px; margin-top: 8px;">Or click Admin Quick Access if you're an authorized admin</p>
+                </div>
+            </div>
+            
+            <!-- Telegram widget container -->
+            <div id="telegramWidget" class="hidden">
+                <div class="loading">
+                    <span class="spinner"></span>
+                    Loading Telegram login...
+                </div>
+            </div>
+        </div>
+        
+        <div class="divider">LOCAL DEVELOPMENT</div>
+        
+        <div id="devSection">
+            <button class="btn-secondary" onclick="devLogin(359511525, 'W3_DV')">
+                👤 Login as W3_DV (Admin)
+            </button>
+            <button class="btn-secondary" onclick="devLogin(224668466, 'Sasha')">
+                👤 Login as Sasha Antropov (Admin)
+            </button>
+        </div>
+        
+        <div id="message" class="message"></div>
+        
+        <div class="footer">
+            <p class="footer-title">Authorized Administrators</p>
+            <div class="admin-list">
+                <span class="admin-badge">W3_DV • ID: 359511525</span>
+                <span class="admin-badge">Sasha • ID: 224668466</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Check for Telegram WebApp context
+        let currentUserId = null;
+        
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tgData = window.Telegram.WebApp.initDataUnsafe;
+            if (tgData && tgData.user) {
+                currentUserId = tgData.user.id;
+                document.getElementById('userId').textContent = currentUserId;
+            } else {
+                document.getElementById('userId').textContent = 'Not in Telegram';
+            }
+        } else {
+            document.getElementById('userId').textContent = 'Open from Telegram';
+        }
+        
+        // Show/hide dev section based on environment
+        if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+            document.getElementById('devSection').style.display = 'none';
+            document.querySelector('.divider').style.display = 'none';
+        }
+        
+        // Admin quick access
+        function adminLogin() {
+            const validAdmins = [359511525, 224668466];
+            
+            if (!currentUserId) {
+                showMessage('Please open this page from Telegram bot', 'error');
+                return;
+            }
+            
+            if (!validAdmins.includes(parseInt(currentUserId))) {
+                showMessage(`Access denied. Your ID (${currentUserId}) is not authorized.`, 'error');
+                return;
+            }
+            
+            // Proceed with login
+            const userData = {
+                id: currentUserId,
+                first_name: currentUserId == 359511525 ? 'W3_DV' : 'Sasha',
+                username: currentUserId == 359511525 ? 'W3_DV' : 'properukrainian',
+                hash: 'quick-access',
+                auth_date: Math.floor(Date.now() / 1000)
+            };
+            
+            performLogin(userData);
+        }
+        
+        // Development login
+        function devLogin(userId, name) {
+            if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+                showMessage('Development login only available on localhost', 'error');
+                return;
+            }
+            
+            const userData = {
+                id: userId,
+                first_name: name,
+                username: userId === 359511525 ? 'W3_DV' : 'properukrainian',
+                hash: 'dev-hash',
+                auth_date: Math.floor(Date.now() / 1000)
+            };
+            
+            performLogin(userData);
+        }
+        
+        // Perform actual login
+        async function performLogin(userData) {
+            showMessage('Authenticating...', 'success');
+            
+            try {
+                const response = await fetch('/api/admin/auth', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.token) {
+                    localStorage.setItem('adminToken', data.token);
+                    localStorage.setItem('adminUser', JSON.stringify(data.user));
+                    showMessage('✅ Login successful! Redirecting...', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/admin/';
+                    }, 1000);
+                } else {
+                    showMessage(`❌ ${data.error || 'Authentication failed'}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`❌ Connection error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Show message
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = `message ${type} show`;
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageEl.classList.remove('show');
+                }, 5000);
+            }
+        }
+        
+        // Try to load Telegram widget (optional)
+        window.addEventListener('load', () => {
+            // Get bot username from URL params or config
+            const urlParams = new URLSearchParams(window.location.search);
+            const botUsername = urlParams.get('bot') || 'cbo_brobot'; // Try common variations
+            
+            // Only try to load widget if explicitly requested
+            if (urlParams.get('widget') === 'true' && botUsername) {
+                const script = document.createElement('script');
+                script.src = 'https://telegram.org/js/telegram-widget.js?22';
+                script.async = true;
+                script.setAttribute('data-telegram-login', botUsername);
+                script.setAttribute('data-size', 'large');
+                script.setAttribute('data-onauth', 'onTelegramAuth(user)');
+                script.setAttribute('data-request-access', 'write');
+                
+                const container = document.getElementById('telegramWidget');
+                container.classList.remove('hidden');
+                container.innerHTML = `<p style="text-align: center; color: #9ca3af;">Loading widget for @${botUsername}...</p>`;
+                container.appendChild(script);
+            }
+        });
+        
+        // Telegram auth callback
+        function onTelegramAuth(user) {
+            performLogin(user);
+        }
+    </script>
+</body>
+</html>

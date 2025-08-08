@@ -1,6 +1,7 @@
 const logger = require('../utils/logger');
 const memoryBank = require('../memory/memoryBank');
 const claudeService = require('../services/claudeService');
+const configService = require('../services/configService');
 // MCP tools moved to experimental - using basic service only
 // const claudeServiceWithTools = require('../services/claudeServiceWithTools');
 
@@ -8,11 +9,39 @@ class CBOAgentHandler {
   constructor() {
     this.conversations = new Map();
     this.useTools = process.env.ENABLE_MCP_TOOLS === 'true';
+    this.currentConfig = null;
+    
+    // Load initial configuration
+    this.loadConfig();
     
     if (this.useTools) {
       logger.info('CBOAgentHandler initialized with MCP tools support');
     } else {
       logger.info('CBOAgentHandler initialized without MCP tools');
+    }
+  }
+  
+  async loadConfig() {
+    try {
+      this.currentConfig = await configService.getActiveConfig();
+      logger.info('Loaded active configuration');
+    } catch (error) {
+      logger.error('Failed to load configuration:', error);
+    }
+  }
+  
+  async reloadConfig(config) {
+    try {
+      this.currentConfig = config || await configService.getActiveConfig();
+      logger.info('Configuration reloaded');
+      
+      // Clear conversation contexts to apply new config
+      this.conversations.clear();
+      
+      return { success: true };
+    } catch (error) {
+      logger.error('Failed to reload configuration:', error);
+      throw error;
     }
   }
 
@@ -82,6 +111,32 @@ class CBOAgentHandler {
 
   async clearContext(userId) {
     this.conversations.delete(userId);
+  }
+  
+  async processWithConfig(message, testConfig) {
+    // Create a temporary context for testing
+    const testContext = {
+      userId: 'test-user',
+      startTime: new Date(),
+      messages: []
+    };
+    
+    try {
+      // Temporarily use test config
+      const originalConfig = this.currentConfig;
+      this.currentConfig = testConfig;
+      
+      // Process message with test config
+      const response = await claudeService.processBusinessQuery(message, testContext, testConfig.system_prompt);
+      
+      // Restore original config
+      this.currentConfig = originalConfig;
+      
+      return response;
+    } catch (error) {
+      logger.error('Error processing with test config:', error);
+      throw error;
+    }
   }
 }
 
