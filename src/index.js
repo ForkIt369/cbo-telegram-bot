@@ -5,7 +5,8 @@ const { Telegraf } = require('telegraf');
 const express = require('express');
 const path = require('path');
 const crypto = require('crypto');
-const fs = require('fs').promises;
+const fs = require('fs');
+const fsPromises = require('fs').promises;
 const jwt = require('jsonwebtoken');
 const logger = require('./utils/logger');
 const CBOAgentHandler = require('./handlers/cboAgentHandler');
@@ -707,7 +708,6 @@ if (process.env.NODE_ENV === 'production') {
 
 // Serve Mini App
 const miniAppPath = path.join(__dirname, '../mini-app/dist');
-const fs = require('fs');
 
 // In production, serve the built Mini App if it exists
 if (fs.existsSync(miniAppPath)) {
