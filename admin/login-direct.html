@@ -467,7 +467,7 @@
         window.addEventListener('load', () => {
             // Get bot username from URL params or config
             const urlParams = new URLSearchParams(window.location.search);
-            const botUsername = urlParams.get('bot') || 'cbo_brobot'; // Try common variations
+            const botUsername = urlParams.get('bot') || 'cbo_DEVbot'; // Your bot username
             
             // Only try to load widget if explicitly requested
             if (urlParams.get('widget') === 'true' && botUsername) {

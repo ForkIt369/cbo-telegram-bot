@@ -782,7 +782,7 @@ if (fs.existsSync(miniAppPath)) {
             <h1>CBO-Bro Mini App</h1>
             <p>The Mini App is being prepared. Please use the Telegram bot directly for now.</p>
             <p>I'm your Chief Business Optimization assistant, helping you optimize through Value, Info, Work & Cash flows.</p>
-            <a href="https://t.me/cbo_bro_bot" class="button">Open in Telegram</a>
+            <a href="https://t.me/cbo_DEVbot" class="button">Open in Telegram</a>
           </div>
         </body>
       </html>
