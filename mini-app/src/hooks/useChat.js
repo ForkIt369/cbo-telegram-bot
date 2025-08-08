@@ -17,7 +17,12 @@ const useChat = (userId) => {
     try {
       const response = await axios.get(`/api/chat/history/${userId}`);
       if (response.data.messages) {
-        setMessages(response.data.messages);
+        // Ensure messages have timestamps
+        const messagesWithTimestamps = response.data.messages.map(msg => ({
+          ...msg,
+          timestamp: msg.timestamp || new Date().toISOString()
+        }));
+        setMessages(messagesWithTimestamps);
       }
     } catch (error) {
       console.error('Failed to load chat history:', error);
@@ -26,35 +31,44 @@ const useChat = (userId) => {
 
   const detectFlow = (text) => {
     const flowKeywords = {
-      value: ['customer', 'user', 'satisfaction', 'experience', 'retention'],
-      info: ['data', 'analytics', 'metrics', 'insights', 'report'],
-      work: ['process', 'operation', 'efficiency', 'productivity', 'workflow'],
-      cash: ['revenue', 'cost', 'profit', 'financial', 'cash', 'money']
+      'Value Flow': ['customer', 'user', 'satisfaction', 'experience', 'retention', 'delivery', 'value'],
+      'Info Flow': ['data', 'analytics', 'metrics', 'insights', 'report', 'information', 'decision'],
+      'Work Flow': ['process', 'operation', 'efficiency', 'productivity', 'workflow', 'optimize', 'performance'],
+      'Cash Flow': ['revenue', 'cost', 'profit', 'financial', 'cash', 'money', 'budget', 'investment']
     };
 
+    let bestMatch = null;
+    let maxCount = 0;
+
     for (const [flow, keywords] of Object.entries(flowKeywords)) {
-      if (keywords.some(kw => text.toLowerCase().includes(kw))) {
-        return flow;
+      const count = keywords.filter(kw => text.toLowerCase().includes(kw)).length;
+      if (count > maxCount) {
+        maxCount = count;
+        bestMatch = flow;
       }
     }
-    return null;
+    
+    return maxCount > 0 ? bestMatch : null;
   };
 
   const sendMessage = useCallback(async (content) => {
     if (!content.trim()) return;
 
-    // Add user message
+    // Add user message with unique ID and timestamp
     const userMessage = {
-      id: Date.now(),
+      id: `user-${Date.now()}`,
       role: 'user',
       content,
-      timestamp: new Date()
+      timestamp: new Date().toISOString()
     };
     
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
     
-    // Haptic feedback would go here if available
+    // Trigger haptic feedback if available
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+      window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+    }
 
     try {
       const response = await axios.post('/api/chat/message', {
@@ -63,17 +77,20 @@ const useChat = (userId) => {
       });
 
       const assistantMessage = {
-        id: Date.now() + 1,
+        id: `assistant-${Date.now()}`,
         role: 'assistant',
         content: response.data.response,
         flow: detectFlow(response.data.response),
-        timestamp: new Date()
+        timestamp: new Date().toISOString()
       };
 
       setMessages(prev => [...prev, assistantMessage]);
       setActiveFlow(assistantMessage.flow);
       
-      // Success feedback
+      // Success haptic feedback
+      if (window.Telegram?.WebApp?.HapticFeedback) {
+        window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+      }
       
       // Clear active flow after 3 seconds
       setTimeout(() => setActiveFlow(null), 3000);
@@ -82,13 +99,19 @@ const useChat = (userId) => {
       console.error('Failed to send message:', error);
       
       const errorMessage = {
-        id: Date.now() + 1,
+        id: `error-${Date.now()}`,
         role: 'assistant',
         content: 'Sorry, I encountered an error. Please try again.',
-        timestamp: new Date()
+        timestamp: new Date().toISOString(),
+        isError: true
       };
       
       setMessages(prev => [...prev, errorMessage]);
+      
+      // Error haptic feedback
+      if (window.Telegram?.WebApp?.HapticFeedback) {
+        window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -96,6 +119,12 @@ const useChat = (userId) => {
 
   const clearChat = useCallback(async () => {
     setMessages([]);
+    setActiveFlow(null);
+    
+    // Haptic feedback for clear action
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+      window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+    }
     
     try {
       await axios.post('/api/chat/clear', { userId });
