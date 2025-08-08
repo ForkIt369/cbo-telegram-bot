@@ -629,13 +629,51 @@ app.get('/api/admin/analytics/flows', adminAuth, async (req, res) => {
   }
 });
 
-// Serve Admin Panel
-app.use('/admin', express.static(path.join(__dirname, '../admin')));
-
-// Redirect to login page
+// Admin Panel Routes - MUST come before static middleware
+// Specific route for login page
 app.get('/admin/login', (req, res) => {
-  res.sendFile(path.join(__dirname, '../admin/login-direct.html'));
+  const loginPath = path.join(__dirname, '../admin/login-direct.html');
+  logger.info('Serving admin login from:', loginPath);
+  res.set('Content-Type', 'text/html');
+  res.sendFile(loginPath, (err) => {
+    if (err) {
+      logger.error('Error serving login page:', err);
+      res.status(404).send(`
+        <!DOCTYPE html>
+        <html>
+        <head><title>Error</title></head>
+        <body style="font-family: sans-serif; padding: 40px; text-align: center;">
+          <h1>Admin Panel Not Found</h1>
+          <p>The admin login page could not be loaded.</p>
+          <p>Error: ${err.message}</p>
+          <a href="/">Return to Home</a>
+        </body>
+        </html>
+      `);
+    }
+  });
 });
+
+// Root admin route
+app.get('/admin', (req, res) => {
+  // Check if user has token, otherwise redirect to login
+  res.redirect('/admin/login');
+});
+
+// Serve static admin files AFTER specific routes
+app.use('/admin', express.static(path.join(__dirname, '../admin'), {
+  index: 'index.html',
+  extensions: ['html'],
+  setHeaders: (res, path) => {
+    if (path.endsWith('.html')) {
+      res.set('Content-Type', 'text/html');
+    } else if (path.endsWith('.css')) {
+      res.set('Content-Type', 'text/css');
+    } else if (path.endsWith('.js')) {
+      res.set('Content-Type', 'application/javascript');
+    }
+  }
+}));
 
 // Webhook setup MUST come before static file serving
 if (process.env.NODE_ENV === 'production') {
