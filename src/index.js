@@ -632,12 +632,15 @@ app.get('/api/admin/analytics/flows', adminAuth, async (req, res) => {
 // Admin Panel Routes - MUST come before static middleware
 // Specific route for login page
 app.get('/admin/login', (req, res) => {
-  const loginPath = path.join(__dirname, '../admin/login-direct.html');
-  logger.info('Serving admin login from:', loginPath);
-  res.set('Content-Type', 'text/html');
-  res.sendFile(loginPath, (err) => {
-    if (err) {
-      logger.error('Error serving login page:', err);
+  try {
+    const loginPath = path.join(__dirname, '../admin/login-direct.html');
+    logger.info('Serving admin login from:', loginPath);
+    
+    // Check if file exists
+    if (fs.existsSync(loginPath)) {
+      res.sendFile(loginPath);
+    } else {
+      logger.error('Admin login page not found at:', loginPath);
       res.status(404).send(`
         <!DOCTYPE html>
         <html>
@@ -645,13 +648,16 @@ app.get('/admin/login', (req, res) => {
         <body style="font-family: sans-serif; padding: 40px; text-align: center;">
           <h1>Admin Panel Not Found</h1>
           <p>The admin login page could not be loaded.</p>
-          <p>Error: ${err.message}</p>
+          <p>File not found: login-direct.html</p>
           <a href="/">Return to Home</a>
         </body>
         </html>
       `);
     }
-  });
+  } catch (error) {
+    logger.error('Error serving admin login:', error);
+    res.status(500).send('Internal server error');
+  }
 });
 
 // Root admin route
