@@ -5,8 +5,8 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 
-const TELEGRAM_BOT_TOKEN = '8040936127:AAEfiJL_RkauBa_fLa1JmY9L-xPsDVYTuQM';
-const NGROK_AUTHTOKEN = '30w1OkKeTHta0xvB3QbRqjTqwmr_3uzsQxxtHi3BRBDsjqxdV';
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '[YOUR_BOT_TOKEN]';
+const NGROK_AUTHTOKEN = process.env.NGROK_AUTHTOKEN || '[YOUR_NGROK_TOKEN]';
 const LOCAL_PORT = 8082;
 
 async function setupTelegramWebhook() {

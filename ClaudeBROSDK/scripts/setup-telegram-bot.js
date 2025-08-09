@@ -8,8 +8,8 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const execAsync = promisify(exec);
 
-const TELEGRAM_BOT_TOKEN = '8040936127:AAEfiJL_RkauBa_fLa1JmY9L-xPsDVYTuQM';
-const BOT_USERNAME = 'cbosdkbot';
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '[YOUR_BOT_TOKEN]';
+const BOT_USERNAME = process.env.BOT_USERNAME || 'cbosdkbot';
 
 async function waitForNgrok(maxAttempts = 30) {
   console.log('⏳ Waiting for ngrok to start...');

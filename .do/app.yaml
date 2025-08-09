@@ -27,7 +27,7 @@ services:
     scope: RUN_TIME
     type: SECRET
   - key: WEBHOOK_URL
-    value: "https://telegram-bot-zv6x7.ondigitalocean.app/telegram-webhook"
+    value: "https://cbo-mcp-system-hs2sx.ondigitalocean.app"
     scope: RUN_TIME
   - key: ENABLE_MCP_TOOLS
     value: "true"

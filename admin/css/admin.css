@@ -1,53 +1,72 @@
-/* CBO Admin Panel Styles - Using CBO Design System */
+/* CBO Admin Panel Styles - Zen Design System */
 
 :root {
-    /* CBO Brand Colors */
+    /* CBO Brand Colors - Enhanced with subtle gradients */
     --cbo-primary: #30D158;
     --cbo-secondary: #00C851;
-    --cbo-glow: rgba(48, 209, 88, 0.3);
-    --cbo-hover: rgba(48, 209, 88, 0.1);
+    --cbo-glow: rgba(48, 209, 88, 0.2);
+    --cbo-hover: rgba(48, 209, 88, 0.08);
+    --cbo-subtle: rgba(48, 209, 88, 0.04);
     
-    /* Dark Theme Foundation */
-    --bg-primary: #0D1117;
-    --bg-secondary: #161B22;
-    --bg-tertiary: #21262D;
-    --bg-elevated: #30363D;
+    /* Dark Theme Foundation - Deeper blacks for contrast */
+    --bg-primary: #0A0E14;
+    --bg-secondary: #141921;
+    --bg-tertiary: #1E2530;
+    --bg-elevated: #252D3A;
+    --bg-glass: rgba(30, 37, 48, 0.6);
     
-    /* Text Colors */
-    --text-primary: #FFFFFF;
-    --text-secondary: #8B949E;
-    --text-tertiary: #6E7681;
+    /* Text Colors - Refined hierarchy */
+    --text-primary: rgba(255, 255, 255, 0.95);
+    --text-secondary: rgba(255, 255, 255, 0.65);
+    --text-tertiary: rgba(255, 255, 255, 0.45);
+    --text-muted: rgba(255, 255, 255, 0.25);
     
-    /* Border Colors */
-    --border-primary: #30363D;
-    --border-secondary: #21262D;
+    /* Border Colors - Softer edges */
+    --border-primary: rgba(255, 255, 255, 0.08);
+    --border-secondary: rgba(255, 255, 255, 0.04);
+    --border-focus: rgba(48, 209, 88, 0.5);
     
-    /* Status Colors */
+    /* Status Colors - Muted for less distraction */
     --error: #F85149;
     --warning: #F0883E;
     --info: #58A6FF;
     --success: #56D364;
     
-    /* Shadows */
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.15);
-    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.2);
-    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.25);
+    /* Shadows - Deeper for depth */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 40px rgba(48, 209, 88, 0.15);
     
-    /* Border Radius */
-    --radius-sm: 6px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
-    --radius-xl: 16px;
+    /* Border Radius - Smoother curves */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --radius-2xl: 32px;
     
     /* Typography */
     --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
     --font-mono: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
     
-    /* Animations */
-    --transition-fast: 0.15s ease;
-    --transition-base: 0.3s ease;
-    --transition-slow: 0.5s ease;
+    /* Spacing - More breathing room */
+    --space-xs: 0.5rem;
+    --space-sm: 1rem;
+    --space-md: 1.5rem;
+    --space-lg: 2rem;
+    --space-xl: 3rem;
+    --space-2xl: 4rem;
+    
+    /* Animations - Smoother transitions */
+    --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Backdrop filters */
+    --blur-sm: blur(8px);
+    --blur-md: blur(16px);
+    --blur-lg: blur(24px);
 }
 
 * {
@@ -66,27 +85,67 @@ html, body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Login Page Styles */
+/* Login Page Styles - Zen minimalism */
 .login-page {
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    background: radial-gradient(ellipse at top, var(--bg-tertiary), var(--bg-primary)),
+                linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.login-page::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, var(--cbo-glow) 0%, transparent 70%);
+    opacity: 0.1;
+    animation: float 20s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(-30px, -30px) rotate(180deg); }
 }
 
 .login-container {
     width: 100%;
-    max-width: 440px;
-    padding: 2rem;
+    max-width: 480px;
+    padding: var(--space-lg);
+    z-index: 1;
 }
 
 .login-card {
-    background: var(--bg-secondary);
+    background: var(--bg-glass);
+    backdrop-filter: var(--blur-lg);
     border: 1px solid var(--border-primary);
-    border-radius: var(--radius-xl);
-    padding: 3rem 2rem;
-    box-shadow: var(--shadow-xl);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-2xl) var(--space-xl);
+    box-shadow: var(--shadow-xl), var(--shadow-glow);
+    position: relative;
+    overflow: hidden;
+}
+
+.login-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cbo-primary), transparent);
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
 }
 
 .login-header {

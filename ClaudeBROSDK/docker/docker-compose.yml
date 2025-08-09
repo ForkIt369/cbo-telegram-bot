@@ -9,7 +9,7 @@ services:
       - "8082:8082"
       - "8084:8084"
     environment:
-      - TELEGRAM_BOT_TOKEN=8040936127:AAEfiJL_RkauBa_fLa1JmY9L-xPsDVYTuQM
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - REDIS_URL=redis://redis:6379
       - NODE_ENV=production
@@ -38,7 +38,7 @@ services:
 
   ngrok:
     image: ngrok/ngrok:alpine
-    command: http backend:8082 --authtoken=30w1OkKeTHta0xvB3QbRqjTqwmr_3uzsQxxtHi3BRBDsjqxdV --log=stdout
+    command: http backend:8082 --authtoken=${NGROK_AUTHTOKEN} --log=stdout
     ports:
       - "4040:4040"
     networks:

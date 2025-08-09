@@ -23,7 +23,7 @@ sleep 3
 
 # Setup Telegram webhook with ngrok
 echo "📱 Setting up Telegram integration..."
-node setup-telegram.js &
+node scripts/setup-telegram.js &
 NGROK_PID=$!
 
 echo ""
