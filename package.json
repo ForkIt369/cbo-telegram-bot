@@ -4,8 +4,10 @@
   "description": "Telegram bot interface for CBO agent",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
+    "start": "node src/webhook-server.js",
+    "start:single": "node src/index.js",
+    "start:combined": "node src/combined-server.js",
+    "dev": "nodemon src/webhook-server.js",
     "build": "cd mini-app && npm ci --production=false && npm run build",
     "test": "echo 'No tests configured'"
   },
