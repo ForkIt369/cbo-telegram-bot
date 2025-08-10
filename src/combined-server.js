@@ -55,7 +55,30 @@ I'm your Chief Bro Officer, here to help optimize your business using the BroVer
 • Work Flow - Efficiency & processes
 • Cash Flow - Money movement & health
 
-How can I help you today?`);
+How can I help you today?`, {
+    reply_markup: {
+      inline_keyboard: [[
+        { 
+          text: '💚 Open CBO Mini App', 
+          web_app: { url: 'https://cbo-mcp-system-hs2sx.ondigitalocean.app/' }
+        }
+      ]]
+    }
+  });
+});
+
+// Add webapp command for main bot
+mainBot.command('webapp', (ctx) => {
+  ctx.reply('Open the CBO Mini App:', {
+    reply_markup: {
+      inline_keyboard: [[
+        { 
+          text: '💚 Open CBO Mini App', 
+          web_app: { url: 'https://cbo-mcp-system-hs2sx.ondigitalocean.app/' }
+        }
+      ]]
+    }
+  });
 });
 
 mainBot.on('text', async (ctx) => {
@@ -94,7 +117,30 @@ if (SDK_TOKEN) {
     
 I'm your advanced business optimization assistant with the BroVerse framework.
 
-Click the menu button below to open the SDK Mini App!`);
+Click the button below to open the SDK Mini App:`, {
+      reply_markup: {
+        inline_keyboard: [[
+          { 
+            text: '🚀 Open SDK App', 
+            web_app: { url: 'https://cbo-mcp-system-hs2sx.ondigitalocean.app/sdk/' }
+          }
+        ]]
+      }
+    });
+  });
+  
+  // Add webapp command for SDK bot
+  sdkBot.command('webapp', (ctx) => {
+    ctx.reply('Open the SDK Mini App:', {
+      reply_markup: {
+        inline_keyboard: [[
+          { 
+            text: '🚀 Open SDK App', 
+            web_app: { url: 'https://cbo-mcp-system-hs2sx.ondigitalocean.app/sdk/' }
+          }
+        ]]
+      }
+    });
   });
   
   sdkBot.on('text', async (ctx) => {
