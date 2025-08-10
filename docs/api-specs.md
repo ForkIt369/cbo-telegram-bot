@@ -545,7 +545,7 @@ services:
 ```json
 {
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.32.1",
+    "@anthropic-ai/sdk": "^0.59.0",
     "telegraf": "^4.16.3",
     "express": "^4.21.1",
     "winston": "^3.17.0",

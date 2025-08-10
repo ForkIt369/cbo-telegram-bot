@@ -1,0 +1,69 @@
+name: cbo-demo-miniapp
+region: nyc
+services:
+- environment_slug: node-js
+  github:
+    branch: master
+    deploy_on_push: true
+    repo: ForkIt369/cbo-telegram-bot
+  # Build both apps
+  build_command: npm install && cd ClaudeBROSDK/server && npm install && cd ../.. && npm run build
+  # Run combined server for both bots
+  run_command: node src/combined-server.js
+  http_port: 3003
+  instance_count: 1
+  instance_size_slug: apps-s-1vcpu-1gb
+  name: telegram-bot
+  envs:
+  - key: NODE_ENV
+    value: production
+    scope: RUN_AND_BUILD_TIME
+  - key: PORT
+    value: "3003"
+    scope: RUN_AND_BUILD_TIME
+  # Main bot token
+  - key: TELEGRAM_BOT_TOKEN
+    value: "8139049417:AAEfmoNXmUhz4y842SdtKL8SjPwgYzIXDNI"
+    scope: RUN_TIME
+    type: SECRET
+  # Duplicate as MAIN_BOT_TOKEN for clarity
+  - key: MAIN_BOT_TOKEN
+    value: "8139049417:AAEfmoNXmUhz4y842SdtKL8SjPwgYzIXDNI"
+    scope: RUN_TIME
+    type: SECRET
+  # SDK bot token
+  - key: SDK_BOT_TOKEN
+    value: "8040936127:AAEfiJL_RkauBa_fLa1JmY9L-xPsDVYTuQM"
+    scope: RUN_TIME
+    type: SECRET
+  - key: ANTHROPIC_API_KEY
+    scope: RUN_TIME
+    type: SECRET
+  - key: WEBHOOK_URL
+    value: "https://cbo-mcp-system-hs2sx.ondigitalocean.app"
+    scope: RUN_TIME
+  - key: ENABLE_MCP_TOOLS
+    value: "true"
+    scope: RUN_AND_BUILD_TIME
+  - key: SERVICE_NAME
+    value: "telegram-bot"
+    scope: RUN_AND_BUILD_TIME
+  health_check:
+    http_path: /health
+    initial_delay_seconds: 10
+    period_seconds: 30
+    timeout_seconds: 5
+    success_threshold: 1
+    failure_threshold: 3
+alerts:
+- rule: DEPLOYMENT_FAILED
+- rule: DOMAIN_FAILED
+ingress:
+  rules:
+  - match:
+      path:
+        prefix: /
+    component:
+      name: telegram-bot
+features:
+- buildpack-stack=ubuntu-22

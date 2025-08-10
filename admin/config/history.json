@@ -1,0 +1,62 @@
+[
+  {
+    "version": "v2.0.0",
+    "model_settings": {
+      "provider": "anthropic",
+      "model": "claude-3-sonnet-20240229",
+      "temperature": 0.7,
+      "max_tokens": 1000,
+      "timeout": 30000
+    },
+    "system_prompt": "You are CBO-Bro, Chief Business Optimization expert using the BroVerse Biz Mental Model™ (BBMM).\n\nYour role is to analyze business challenges through the lens of Four Flows:\n1. VALUE FLOW - Customer value creation and delivery\n2. INFO FLOW - Data, insights, and decision-making  \n3. WORK FLOW - Operations and process efficiency\n4. CASH FLOW - Financial health and sustainability\n\nYou also consider 12 Core Capabilities and 64 Business Patterns.\n\nWhen responding:\n1. Identify the primary flow(s) affected\n2. Provide 2-3 specific, actionable recommendations\n3. Suggest immediate next steps\n4. Keep total response under 1000 characters when possible",
+    "flow_keywords": {
+      "value": [
+        "customer",
+        "user",
+        "satisfaction",
+        "experience",
+        "retention",
+        "value",
+        "service",
+        "product"
+      ],
+      "info": [
+        "data",
+        "analytics",
+        "metrics",
+        "insights",
+        "report",
+        "information",
+        "analysis",
+        "intelligence"
+      ],
+      "work": [
+        "process",
+        "operation",
+        "efficiency",
+        "productivity",
+        "workflow",
+        "automation",
+        "optimization"
+      ],
+      "cash": [
+        "revenue",
+        "cost",
+        "profit",
+        "financial",
+        "cash",
+        "money",
+        "budget",
+        "investment"
+      ]
+    },
+    "features": {
+      "enable_mcp_tools": false,
+      "enable_memory_bank": true,
+      "enable_analytics": true,
+      "enable_auto_save": true
+    },
+    "saved_at": "2025-08-10T04:47:14.373Z",
+    "hash": "0cd57d99"
+  }
+]

@@ -133,7 +133,7 @@ Memory Save → Telegram Reply → User
 - **Runtime**: Node.js 18.x
 - **Framework**: Express 4.21.1
 - **Bot Framework**: Telegraf 4.16.3
-- **AI Integration**: @anthropic-ai/sdk 0.32.1
+- **AI Integration**: @anthropic-ai/sdk 0.59.0 with Context7 MCP integration
 - **Logging**: Winston 3.17.0
 - **Process Manager**: Nodemon 3.1.9 (dev)
 - **Environment**: dotenv 16.4.7
