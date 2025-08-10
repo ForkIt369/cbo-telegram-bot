@@ -37,6 +37,32 @@ const mainBot = new Telegraf(process.env.MAIN_BOT_TOKEN || process.env.TELEGRAM_
 const CBOAgentHandler = require('./handlers/cboAgentHandler');
 const mainHandler = new CBOAgentHandler();
 
+// Main bot handlers
+mainBot.start((ctx) => {
+  ctx.reply(`🤖 Welcome to CBO-Bro Bot!
+  
+I'm your Chief Bro Officer, here to help optimize your business using the BroVerse Biz Mental Model™.
+
+🎯 I analyze through Four Flows:
+• Value Flow - Customer happiness & pricing
+• Info Flow - Knowledge & decisions  
+• Work Flow - Efficiency & processes
+• Cash Flow - Money movement & health
+
+How can I help you today?`);
+});
+
+mainBot.on('text', async (ctx) => {
+  try {
+    await ctx.telegram.sendChatAction(ctx.chat.id, 'typing');
+    const response = await mainHandler.processMessage(ctx.from.id, ctx.message.text);
+    await ctx.reply(response);
+  } catch (error) {
+    logger.error('Main bot error:', error);
+    await ctx.reply('Sorry, I encountered an error. Please try again.');
+  }
+});
+
 // Set up main bot routes and webhook at /webhook/main
 app.use('/webhook/main', (req, res, next) => {
   logger.info('Main bot webhook received');
@@ -45,8 +71,9 @@ app.use('/webhook/main', (req, res, next) => {
 
 // SDK Bot Setup (cbosdkbot) 
 let sdkBotStatus = 'initializing';
+let sdkBot = null;
 if (process.env.SDK_BOT_TOKEN) {
-  const sdkBot = new Telegraf(process.env.SDK_BOT_TOKEN);
+  sdkBot = new Telegraf(process.env.SDK_BOT_TOKEN);
   
   // SDK Bot handlers
   sdkBot.start((ctx) => {

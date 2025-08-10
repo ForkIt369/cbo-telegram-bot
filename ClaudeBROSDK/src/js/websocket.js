@@ -1,6 +1,10 @@
 class ClaudeSDKBridge {
   constructor(config = {}) {
-    this.wsUrl = config.wsUrl || 'ws://localhost:8084';
+    // Use production WebSocket URL when in production, fallback to localhost for dev
+    const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsHost = isProduction ? window.location.host : 'localhost:8084';
+    this.wsUrl = config.wsUrl || `${wsProtocol}//${wsHost}/ws`;
     this.sessionId = config.sessionId || this.getOrCreateSessionId();
     this.ws = null;
     this.messageQueue = [];
