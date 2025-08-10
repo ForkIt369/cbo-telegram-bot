@@ -70,7 +70,15 @@ mainBot.on('text', async (ctx) => {
 });
 
 // Set up main bot routes and webhook at /webhook/main
-app.post('/webhook/main', mainBot.webhookCallback());
+app.post('/webhook/main', async (req, res) => {
+  try {
+    await mainBot.handleUpdate(req.body);
+    res.sendStatus(200);
+  } catch (error) {
+    logger.error('Main webhook error:', error);
+    res.sendStatus(200);
+  }
+});
 
 // SDK Bot Setup (cbosdkbot) 
 let sdkBotStatus = 'initializing';
@@ -102,7 +110,15 @@ Click the menu button below to open the SDK Mini App!`);
   });
   
   // SDK webhook at /webhook/sdk
-  app.post('/webhook/sdk', sdkBot.webhookCallback());
+  app.post('/webhook/sdk', async (req, res) => {
+    try {
+      await sdkBot.handleUpdate(req.body);
+      res.sendStatus(200);
+    } catch (error) {
+      logger.error('SDK webhook error:', error);
+      res.sendStatus(200);
+    }
+  });
   
   sdkBotStatus = 'ready';
 } else {
