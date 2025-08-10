@@ -126,6 +126,36 @@ Click the menu button below to open the SDK Mini App!`);
   sdkBotStatus = 'disabled';
 }
 
+// API endpoints for Mini App
+const whitelistService = require('./services/whitelistService');
+
+// Check access endpoint for Mini App
+app.post('/api/auth/check', async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const isWhitelisted = whitelistService.isWhitelisted(parseInt(userId));
+    res.json({ 
+      authorized: isWhitelisted,
+      isAdmin: whitelistService.isAdmin(parseInt(userId))
+    });
+  } catch (error) {
+    logger.error('Error checking access:', error);
+    res.status(500).json({ error: 'Failed to check access' });
+  }
+});
+
+// Chat endpoint for Mini App
+app.post('/api/chat', async (req, res) => {
+  try {
+    const { message, userId } = req.body;
+    const response = await mainHandler.processMessage(userId || 'mini-app-user', message);
+    res.json({ response });
+  } catch (error) {
+    logger.error('API error:', error);
+    res.status(500).json({ error: 'Processing failed' });
+  }
+});
+
 // Serve Main Bot Mini App at root
 const miniAppPath = path.join(__dirname, '../mini-app/dist');
 if (require('fs').existsSync(miniAppPath)) {
