@@ -144,7 +144,7 @@ app.post('/api/auth/check', async (req, res) => {
   }
 });
 
-// Chat endpoint for Mini App
+// Chat endpoint for Mini App (keeping for backwards compatibility)
 app.post('/api/chat', async (req, res) => {
   try {
     const { message, userId } = req.body;
@@ -153,6 +153,41 @@ app.post('/api/chat', async (req, res) => {
   } catch (error) {
     logger.error('API error:', error);
     res.status(500).json({ error: 'Processing failed' });
+  }
+});
+
+// Get chat history
+app.get('/api/chat/history/:userId', async (req, res) => {
+  try {
+    const messages = mainHandler.getOrCreateContext(req.params.userId).messages;
+    res.json({ messages: messages.slice(-20) });
+  } catch (error) {
+    logger.error('Error fetching chat history:', error);
+    res.status(500).json({ error: 'Failed to fetch history' });
+  }
+});
+
+// Send message (main endpoint used by mini app)
+app.post('/api/chat/message', async (req, res) => {
+  try {
+    const { userId, message } = req.body;
+    const response = await mainHandler.processMessage(userId, message);
+    res.json({ response });
+  } catch (error) {
+    logger.error('Error processing message:', error);
+    res.status(500).json({ error: 'Failed to process message' });
+  }
+});
+
+// Clear chat
+app.post('/api/chat/clear', async (req, res) => {
+  try {
+    const { userId } = req.body;
+    await mainHandler.clearContext(userId);
+    res.json({ success: true });
+  } catch (error) {
+    logger.error('Error clearing chat:', error);
+    res.status(500).json({ error: 'Failed to clear chat' });
   }
 });
 
