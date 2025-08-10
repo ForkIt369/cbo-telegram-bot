@@ -26,6 +26,11 @@ app.get('/health', (req, res) => {
     bots: {
       main: mainBotStatus,
       sdk: sdkBotStatus
+    },
+    env: {
+      hasMainToken: !!process.env.MAIN_BOT_TOKEN,
+      hasSdkToken: !!process.env.SDK_BOT_TOKEN,
+      nodeEnv: process.env.NODE_ENV
     }
   });
 });
@@ -64,16 +69,15 @@ mainBot.on('text', async (ctx) => {
 });
 
 // Set up main bot routes and webhook at /webhook/main
-app.use('/webhook/main', (req, res, next) => {
-  logger.info('Main bot webhook received');
-  next();
-}, mainBot.webhookCallback('/webhook/main'));
+app.post('/webhook/main', mainBot.webhookCallback());
 
 // SDK Bot Setup (cbosdkbot) 
 let sdkBotStatus = 'initializing';
 let sdkBot = null;
-if (process.env.SDK_BOT_TOKEN) {
-  sdkBot = new Telegraf(process.env.SDK_BOT_TOKEN);
+const SDK_TOKEN = process.env.SDK_BOT_TOKEN;
+if (SDK_TOKEN) {
+  logger.info('Initializing SDK bot with token:', SDK_TOKEN.substring(0, 10) + '...');
+  sdkBot = new Telegraf(SDK_TOKEN);
   
   // SDK Bot handlers
   sdkBot.start((ctx) => {
@@ -97,10 +101,7 @@ Click the menu button below to open the SDK Mini App!`);
   });
   
   // SDK webhook at /webhook/sdk
-  app.use('/webhook/sdk', (req, res, next) => {
-    logger.info('SDK bot webhook received');
-    next();
-  }, sdkBot.webhookCallback('/webhook/sdk'));
+  app.post('/webhook/sdk', sdkBot.webhookCallback());
   
   sdkBotStatus = 'ready';
 } else {
@@ -162,7 +163,7 @@ app.listen(PORT, async () => {
     }
     
     // Set up SDK bot webhook if configured
-    if (sdkBot && process.env.SDK_BOT_TOKEN) {
+    if (sdkBot) {
       try {
         await sdkBot.telegram.setWebhook(`${WEBHOOK_URL}/webhook/sdk`);
         await sdkBot.telegram.setChatMenuButton({
