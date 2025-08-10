@@ -162,9 +162,8 @@ app.listen(PORT, async () => {
     }
     
     // Set up SDK bot webhook if configured
-    if (process.env.SDK_BOT_TOKEN) {
+    if (sdkBot && process.env.SDK_BOT_TOKEN) {
       try {
-        const sdkBot = new Telegraf(process.env.SDK_BOT_TOKEN);
         await sdkBot.telegram.setWebhook(`${WEBHOOK_URL}/webhook/sdk`);
         await sdkBot.telegram.setChatMenuButton({
           menu_button: {
@@ -184,6 +183,10 @@ app.listen(PORT, async () => {
     // Development mode - use polling
     mainBot.launch();
     mainBotStatus = 'active';
+    if (sdkBot) {
+      sdkBot.launch();
+      sdkBotStatus = 'active';
+    }
     logger.info('Bots started in polling mode');
   }
 });
