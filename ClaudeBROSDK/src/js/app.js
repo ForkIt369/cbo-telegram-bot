@@ -10,7 +10,16 @@ class ClaudeBROApp {
   async init() {
     console.log('Initializing ClaudeBRO App...');
     
-    // Initialize WebSocket bridge
+    // Check if we're in production (not localhost or ngrok dev)
+    const isProduction = window.location.hostname !== 'localhost' && 
+                        window.location.hostname !== '127.0.0.1' &&
+                        !window.location.hostname.includes('ngrok');
+    
+    if (isProduction) {
+      console.log('Running in production mode - using API client');
+    }
+    
+    // Initialize WebSocket bridge (or API client in production)
     this.bridge = new ClaudeSDKBridge({
       wsUrl: this.getWebSocketUrl()
     });

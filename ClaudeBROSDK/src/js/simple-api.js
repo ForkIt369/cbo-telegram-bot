@@ -3,7 +3,8 @@ class SimpleSDKClient {
   constructor() {
     // Determine if we're in production or development
     this.isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-    this.apiBase = this.isProduction ? '/sdk/api' : 'http://localhost:3003/sdk/api';
+    // Use the main /api endpoints, not /sdk/api
+    this.apiBase = this.isProduction ? '/api' : 'http://localhost:3003/api';
     this.sessionId = this.getOrCreateSessionId();
   }
 
@@ -18,14 +19,14 @@ class SimpleSDKClient {
 
   async sendMessage(message) {
     try {
-      const response = await fetch(`${this.apiBase}/chat`, {
+      const response = await fetch(`${this.apiBase}/chat/message`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           message: message,
-          sessionId: this.sessionId
+          userId: this.sessionId
         })
       });
 
@@ -43,7 +44,13 @@ class SimpleSDKClient {
 }
 
 // Override the WebSocket client with simple API client in production
-if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+// Check for production environment (not localhost, not 127.0.0.1, not ngrok development)
+const isLocalDev = window.location.hostname === 'localhost' || 
+                   window.location.hostname === '127.0.0.1' ||
+                   window.location.hostname.includes('ngrok-free.app');
+
+if (!isLocalDev) {
+  console.log('SDK: Using production API mode');
   window.ClaudeSDKBridge = class {
     constructor(config = {}) {
       this.client = new SimpleSDKClient();
