@@ -93,6 +93,36 @@ app.get('/test-webhook', (req, res) => {
   res.json({ message: 'Webhook server is running', timestamp: new Date().toISOString() });
 });
 
+// API endpoints for Mini App
+const whitelistService = require('./services/whitelistService');
+
+// Check access endpoint for Mini App
+app.post('/api/auth/check', async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const isWhitelisted = whitelistService.isWhitelisted(parseInt(userId));
+    res.json({ 
+      authorized: isWhitelisted,
+      isAdmin: whitelistService.isAdmin(parseInt(userId))
+    });
+  } catch (error) {
+    logger.error('Error checking access:', error);
+    res.status(500).json({ error: 'Failed to check access' });
+  }
+});
+
+// Chat endpoint for Mini App
+app.post('/api/chat', async (req, res) => {
+  try {
+    const { message, userId } = req.body;
+    const response = await mainHandler.processMessage(userId || 'mini-app-user', message);
+    res.json({ response });
+  } catch (error) {
+    logger.error('API error:', error);
+    res.status(500).json({ error: 'Processing failed' });
+  }
+});
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ 
