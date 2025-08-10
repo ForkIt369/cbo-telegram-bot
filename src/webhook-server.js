@@ -88,6 +88,11 @@ Click the menu button below to open the SDK Mini App!`);
   sdkBotStatus = 'ready';
 }
 
+// Test endpoint
+app.get('/test-webhook', (req, res) => {
+  res.json({ message: 'Webhook server is running', timestamp: new Date().toISOString() });
+});
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ 
@@ -146,8 +151,15 @@ app.post('/webhook', async (req, res) => {
   }
 });
 
+// Log all incoming requests for debugging
+app.use((req, res, next) => {
+  logger.info(`Incoming ${req.method} request to ${req.path}`);
+  next();
+});
+
 // Specific webhook endpoints that redirect to universal handler
 app.post('/webhook/main', async (req, res) => {
+  logger.info('Main webhook endpoint hit');
   if (mainBot) {
     try {
       await mainBot.handleUpdate(req.body);
@@ -162,6 +174,7 @@ app.post('/webhook/main', async (req, res) => {
 });
 
 app.post('/webhook/sdk', async (req, res) => {
+  logger.info('SDK webhook endpoint hit');
   if (sdkBot) {
     try {
       await sdkBot.handleUpdate(req.body);
