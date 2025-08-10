@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDK App Redirect</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div style="padding: 20px; font-family: system-ui, -apple-system, sans-serif;">
+        <h1>SDK App Loading...</h1>
+        
+        <div id="status"></div>
+        
+        <script>
+            const status = document.getElementById('status');
+            
+            // Log current location
+            status.innerHTML = `
+                <h2>Current Location:</h2>
+                <p>URL: ${window.location.href}</p>
+                <p>Host: ${window.location.host}</p>
+                <p>Origin: ${window.location.origin}</p>
+                
+                <h2>Telegram WebApp:</h2>
+                <p>Available: ${window.Telegram?.WebApp ? 'YES' : 'NO'}</p>
+            `;
+            
+            // Check if we're in Telegram
+            if (window.Telegram?.WebApp) {
+                const tg = window.Telegram.WebApp;
+                tg.ready();
+                
+                status.innerHTML += `
+                    <p>Version: ${tg.version}</p>
+                    <p>Platform: ${tg.platform}</p>
+                    <p>User ID: ${tg.initDataUnsafe?.user?.id || 'Not available'}</p>
+                `;
+                
+                // Redirect to the actual app after 2 seconds
+                setTimeout(() => {
+                    status.innerHTML += '<p>Redirecting to SDK app...</p>';
+                    window.location.href = '/sdk/index.html';
+                }, 2000);
+            } else {
+                status.innerHTML += '<p style="color: red;">Not running in Telegram WebApp context!</p>';
+                
+                // Still redirect for testing
+                setTimeout(() => {
+                    status.innerHTML += '<p>Redirecting to SDK app...</p>';
+                    window.location.href = '/sdk/index.html';
+                }, 2000);
+            }
+        </script>
+    </div>
+</body>
+</html>
