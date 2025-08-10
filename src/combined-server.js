@@ -22,6 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'ok', 
+    server: 'combined-server',
     timestamp: new Date().toISOString(),
     bots: {
       main: mainBotStatus,

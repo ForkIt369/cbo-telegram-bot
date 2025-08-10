@@ -97,6 +97,7 @@ app.get('/test-webhook', (req, res) => {
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'ok', 
+    server: 'webhook-server',
     timestamp: new Date().toISOString(),
     bots: {
       main: mainBotStatus,
