@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDK Debug Page</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <h1>SDK Debug Information</h1>
+    
+    <div id="debug-info">
+        <h2>Environment Info:</h2>
+        <pre id="env-info"></pre>
+        
+        <h2>Telegram WebApp Info:</h2>
+        <pre id="tg-info"></pre>
+        
+        <h2>Script Loading Test:</h2>
+        <pre id="script-test"></pre>
+    </div>
+    
+    <script>
+        // Display environment info
+        const envInfo = {
+            hostname: window.location.hostname,
+            protocol: window.location.protocol,
+            port: window.location.port,
+            pathname: window.location.pathname,
+            href: window.location.href,
+            origin: window.location.origin,
+            userAgent: navigator.userAgent
+        };
+        document.getElementById('env-info').textContent = JSON.stringify(envInfo, null, 2);
+        
+        // Display Telegram WebApp info
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tgInfo = {
+                initData: window.Telegram.WebApp.initData,
+                initDataUnsafe: window.Telegram.WebApp.initDataUnsafe,
+                version: window.Telegram.WebApp.version,
+                platform: window.Telegram.WebApp.platform,
+                themeParams: window.Telegram.WebApp.themeParams
+            };
+            document.getElementById('tg-info').textContent = JSON.stringify(tgInfo, null, 2);
+        } else {
+            document.getElementById('tg-info').textContent = 'Not running in Telegram WebApp context';
+        }
+        
+        // Test script loading
+        const scriptTest = {
+            isLocalDev: window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1' ||
+                       window.location.hostname.includes('ngrok-free.app'),
+            shouldUseWebSocket: false,
+            shouldUseAPI: false
+        };
+        
+        scriptTest.shouldUseWebSocket = scriptTest.isLocalDev;
+        scriptTest.shouldUseAPI = !scriptTest.isLocalDev;
+        
+        document.getElementById('script-test').textContent = JSON.stringify(scriptTest, null, 2);
+        
+        // Test loading simple-api.js
+        const script = document.createElement('script');
+        script.src = 'js/simple-api.js';
+        script.onload = () => {
+            console.log('simple-api.js loaded successfully');
+            document.getElementById('script-test').textContent += '\n\nsimple-api.js loaded: YES';
+            
+            // Check if ClaudeSDKBridge was overridden
+            if (window.ClaudeSDKBridge) {
+                document.getElementById('script-test').textContent += '\nClaudeSDKBridge defined: YES';
+            }
+        };
+        script.onerror = () => {
+            console.error('Failed to load simple-api.js');
+            document.getElementById('script-test').textContent += '\n\nsimple-api.js loaded: NO (ERROR)';
+        };
+        document.head.appendChild(script);
+    </script>
+</body>
+</html>
