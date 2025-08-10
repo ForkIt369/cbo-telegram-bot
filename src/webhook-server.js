@@ -175,10 +175,16 @@ app.post('/webhook/sdk', async (req, res) => {
   }
 });
 
-// Serve Main Bot Mini App at root
+// Serve Main Bot Mini App at root (but not for webhook routes)
 const miniAppPath = path.join(__dirname, '../mini-app/dist');
 if (require('fs').existsSync(miniAppPath)) {
-  app.use('/', express.static(miniAppPath));
+  app.use('/', (req, res, next) => {
+    // Skip static serving for webhook routes
+    if (req.path.startsWith('/webhook')) {
+      return next();
+    }
+    express.static(miniAppPath)(req, res, next);
+  });
 }
 
 // Serve SDK Bot Mini App at /sdk
