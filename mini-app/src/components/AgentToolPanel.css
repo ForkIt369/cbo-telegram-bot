@@ -1,0 +1,312 @@
+/* Agent Tool Panel Styles */
+@import '../styles/design-system.css';
+
+.agent-tool-panel {
+  position: relative;
+  background: var(--bg-secondary);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+/* Tools Header */
+.tools-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tools-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.tools-count {
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 8px;
+  border-radius: 12px;
+}
+
+/* Tools Grid */
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  padding: 16px;
+  max-height: 320px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+.tools-grid::-webkit-scrollbar {
+  width: 4px;
+}
+
+.tools-grid::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tools-grid::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+.tools-grid::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Tool Card */
+.tool-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 12px;
+  min-height: 120px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  overflow: hidden;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.tool-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: inherit;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.tool-card:hover::before {
+  opacity: 1;
+}
+
+.tool-card.selected {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Tool Icon */
+.tool-icon {
+  font-size: 32px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  transition: transform 0.3s ease;
+}
+
+/* Tool Info */
+.tool-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  width: 100%;
+}
+
+.tool-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.tool-description {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.3;
+  opacity: 0.8;
+}
+
+/* Hover Indicator */
+.tool-hover-indicator {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 16px;
+  height: 16px;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: all 0.3s ease;
+}
+
+.tool-card:hover .tool-hover-indicator {
+  opacity: 0.5;
+  transform: translateX(0);
+}
+
+.tool-hover-indicator svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Tools Tip */
+.tools-tip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tip-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.tip-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Agent-Specific Animations */
+.agent-tool-panel[data-agent="cbo"] .tool-card:hover {
+  animation: cbo-pulse 2s infinite;
+}
+
+.agent-tool-panel[data-agent="bigsis"] .tool-card:hover {
+  animation: bigsis-wave 2s infinite;
+}
+
+.agent-tool-panel[data-agent="bro"] .tool-card:hover {
+  animation: bro-energize 0.5s;
+}
+
+.agent-tool-panel[data-agent="lilsis"] .tool-card:hover {
+  animation: lilsis-float 2s infinite;
+}
+
+/* Animations */
+@keyframes cbo-pulse {
+  0%, 100% { transform: translateY(-5px) scale(1.05); }
+  50% { transform: translateY(-5px) scale(1.08); }
+}
+
+@keyframes bigsis-wave {
+  0%, 100% { transform: translateY(-5px) scale(1.05) rotate(0deg); }
+  25% { transform: translateY(-7px) scale(1.05) rotate(-1deg); }
+  75% { transform: translateY(-3px) scale(1.05) rotate(1deg); }
+}
+
+@keyframes bro-energize {
+  0% { transform: translateY(-5px) scale(1.05) rotate(0deg); }
+  25% { transform: translateY(-5px) scale(1.05) rotate(-2deg); }
+  50% { transform: translateY(-5px) scale(1.05) rotate(2deg); }
+  75% { transform: translateY(-5px) scale(1.05) rotate(-2deg); }
+  100% { transform: translateY(-5px) scale(1.05) rotate(0deg); }
+}
+
+@keyframes lilsis-float {
+  0%, 100% { transform: translateY(-5px) scale(1.05); }
+  33% { transform: translateY(-8px) scale(1.05); }
+  66% { transform: translateY(-2px) scale(1.05); }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+  .tools-header {
+    padding: 12px 16px;
+  }
+  
+  .tools-title {
+    font-size: 14px;
+  }
+  
+  .tools-grid {
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 8px;
+    padding: 12px;
+    max-height: 280px;
+  }
+  
+  .tool-card {
+    padding: 12px 8px;
+    min-height: 100px;
+  }
+  
+  .tool-icon {
+    font-size: 28px;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .tool-name {
+    font-size: 12px;
+  }
+  
+  .tool-description {
+    font-size: 10px;
+  }
+  
+  .tools-tip {
+    padding: 10px 12px;
+  }
+  
+  .tip-text {
+    font-size: 11px;
+  }
+}
+
+/* Tablet Responsiveness */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .tools-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .tool-card {
+    transition: none;
+  }
+  
+  .tool-icon {
+    animation: none !important;
+  }
+  
+  .tool-hover-indicator {
+    transition: none;
+  }
+}
+
+/* Dark Mode Enhancement */
+@media (prefers-color-scheme: dark) {
+  .tool-card {
+    background: rgba(13, 17, 23, 0.6);
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+  
+  .tool-card:hover {
+    background: rgba(22, 27, 34, 0.8);
+  }
+  
+  .tools-tip {
+    background: rgba(13, 17, 23, 0.8);
+  }
+}
