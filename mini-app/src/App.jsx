@@ -1,10 +1,13 @@
 import React, { useEffect, useState, lazy, Suspense } from 'react';
-import { AppRoot } from '@telegram-apps/telegram-ui';
 import './styles/design-system.css';
 import './styles/performance.css';
 
 // Lazy load the main interface for better initial load
-const OptimizedChatInterface = lazy(() => import('./components/OptimizedChatInterface'));
+const OptimizedChatInterface = lazy(() => import('./components/OptimizedChatInterface').catch(() => {
+  // Fallback to simple chat interface if optimized version fails
+  console.warn('Failed to load OptimizedChatInterface, falling back to SimpleChatInterface');
+  return import('./components/SimpleChatInterface');
+}));
 
 function App() {
   const [theme, setTheme] = useState('dark');
@@ -128,10 +131,9 @@ function App() {
   }
   
   return (
-    <AppRoot
-      appearance={theme}
-      platform={window.Telegram?.WebApp?.platform || 'ios'}
-      className="app-root enhanced"
+    <div 
+      className={`app-root enhanced telegram-app theme-${theme}`}
+      data-platform={window.Telegram?.WebApp?.platform || 'ios'}
     >
       <Suspense fallback={
         <div className="app-loading">
@@ -141,7 +143,7 @@ function App() {
       }>
         <OptimizedChatInterface userId={userId} />
       </Suspense>
-    </AppRoot>
+    </div>
   );
 }
 
