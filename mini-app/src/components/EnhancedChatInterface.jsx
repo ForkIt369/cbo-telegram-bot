@@ -447,50 +447,8 @@ const EnhancedChatInterface = ({ userId }) => {
                 
                 <h1 className="welcome-title">Welcome to BroVerse</h1>
                 <p className="welcome-subtitle">
-                  Select an AI agent above and optimize your business with the BBMM™ Four Flows
+                  Select your AI Business Advisor to get started
                 </p>
-                
-                <div className="four-flows-grid">
-                  <motion.div
-                    className="flow-card glass-surface"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <span className="flow-icon">💎</span>
-                    <h3>Value Flow</h3>
-                    <p>Customer delivery & satisfaction</p>
-                  </motion.div>
-                  
-                  <motion.div
-                    className="flow-card glass-surface"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <span className="flow-icon">📊</span>
-                    <h3>Info Flow</h3>
-                    <p>Data-driven decisions</p>
-                  </motion.div>
-                  
-                  <motion.div
-                    className="flow-card glass-surface"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <span className="flow-icon">⚡</span>
-                    <h3>Work Flow</h3>
-                    <p>Operational efficiency</p>
-                  </motion.div>
-                  
-                  <motion.div
-                    className="flow-card glass-surface"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <span className="flow-icon">💰</span>
-                    <h3>Cash Flow</h3>
-                    <p>Financial optimization</p>
-                  </motion.div>
-                </div>
                 
                 <div className="welcome-cta">
                   <p>Ask {agents[currentAgent].name} anything about your business challenges!</p>

@@ -3,23 +3,23 @@
 
 .enhanced-chat-input {
   position: relative;
-  padding: var(--space-3);
+  padding: 16px;
   background: var(--bg-primary);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   transition: all var(--transition-base);
 }
 
 .enhanced-chat-input.expanded {
-  padding-bottom: var(--space-4);
+  padding-bottom: 24px;
 }
 
 /* Suggestion Pills */
 .suggestion-pills-container {
   display: flex;
-  gap: var(--space-2);
-  margin-bottom: var(--space-3);
+  gap: 8px;
+  margin-bottom: 12px;
   overflow-x: auto;
-  padding: var(--space-1) 0;
+  padding: 4px 0;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
@@ -31,13 +31,13 @@
 .suggestion-pill {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-full);
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 20px;
   border: 1px solid rgba(48, 209, 88, 0.3);
   background: rgba(48, 209, 88, 0.08);
   color: var(--text-primary);
-  font-size: var(--text-sm);
+  font-size: 13px;
   white-space: nowrap;
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -131,9 +131,9 @@
 .input-container {
   display: flex;
   align-items: flex-end;
-  gap: var(--space-2);
-  padding: var(--space-2);
-  border-radius: var(--radius-lg);
+  gap: 8px;
+  padding: 8px;
+  border-radius: 16px;
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   background: rgba(22, 27, 34, 0.6);
@@ -207,15 +207,15 @@
 
 .input-field {
   width: 100%;
-  min-height: var(--touch-min);
-  max-height: 200px;
-  padding: var(--space-2) var(--space-3);
+  min-height: 40px;
+  max-height: 120px;
+  padding: 8px 12px;
   background: transparent;
   border: none;
   color: var(--text-primary);
-  font-size: var(--text-base);
+  font-size: 14px;
   font-family: var(--font-primary);
-  line-height: var(--leading-normal);
+  line-height: 1.4;
   resize: none;
   outline: none;
   scrollbar-width: thin;
@@ -353,16 +353,16 @@
 /* Mobile Optimizations */
 @media (max-width: 640px) {
   .enhanced-chat-input {
-    padding: var(--space-2);
+    padding: 12px;
     padding-bottom: env(safe-area-inset-bottom);
   }
   
   .suggestion-pills-container {
-    margin-bottom: var(--space-2);
+    margin-bottom: 8px;
   }
   
   .input-container {
-    padding: var(--space-2);
+    padding: 8px;
   }
   
   .input-field {
