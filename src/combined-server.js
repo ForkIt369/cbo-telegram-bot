@@ -237,10 +237,27 @@ app.post('/api/chat/clear', async (req, res) => {
   }
 });
 
-// Serve Main Bot Mini App at root
+// CRITICAL: Serve Mini App static files properly
+const fs = require('fs');
 const miniAppPath = path.join(__dirname, '../mini-app/dist');
-if (require('fs').existsSync(miniAppPath)) {
-  app.use('/', express.static(miniAppPath));
+logger.info(`Mini App path: ${miniAppPath}, exists: ${fs.existsSync(miniAppPath)}`);
+
+if (fs.existsSync(miniAppPath)) {
+  // Serve static files with proper cache headers
+  app.use(express.static(miniAppPath, {
+    maxAge: '1d',
+    setHeaders: (res, path) => {
+      if (path.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      } else if (path.endsWith('.js') || path.endsWith('.css')) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      }
+    }
+  }));
+  
+  logger.info('Mini App static files configured');
+} else {
+  logger.warn(`Mini App dist folder not found at ${miniAppPath}`);
 }
 
 // Serve SDK Bot Mini App at /sdk

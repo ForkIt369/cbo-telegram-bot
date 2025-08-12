@@ -217,12 +217,6 @@ app.post('/webhook', async (req, res) => {
   }
 });
 
-// Log all incoming requests for debugging
-app.use((req, res, next) => {
-  logger.info(`Incoming ${req.method} request to ${req.path}`);
-  next();
-});
-
 // Specific webhook endpoints that redirect to universal handler
 app.post('/webhook/main', async (req, res) => {
   logger.info('Main webhook endpoint hit');
@@ -255,15 +249,42 @@ app.post('/webhook/sdk', async (req, res) => {
 });
 
 // Serve Main Bot Mini App at root (but not for webhook routes)
+const fs = require('fs');
 const miniAppPath = path.join(__dirname, '../mini-app/dist');
-if (require('fs').existsSync(miniAppPath)) {
-  app.use('/', (req, res, next) => {
-    // Skip static serving for webhook routes
-    if (req.path.startsWith('/webhook')) {
+logger.info(`Mini App path: ${miniAppPath}, exists: ${fs.existsSync(miniAppPath)}`);
+
+if (fs.existsSync(miniAppPath)) {
+  // Serve static files with proper cache headers
+  app.use(express.static(miniAppPath, {
+    maxAge: '1d',
+    setHeaders: (res, filepath) => {
+      if (filepath.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      } else if (filepath.endsWith('.js') || filepath.endsWith('.css')) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      }
+    }
+  }));
+  
+  // Serve index.html for any route that doesn't match a file
+  app.get('*', (req, res, next) => {
+    // Skip API and webhook routes
+    if (req.path.startsWith('/api') || req.path.startsWith('/webhook') || req.path.startsWith('/health') || req.path.startsWith('/sdk') || req.path.startsWith('/admin')) {
       return next();
     }
-    express.static(miniAppPath)(req, res, next);
+    
+    const indexPath = path.join(miniAppPath, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      logger.error(`Index.html not found at ${indexPath}`);
+      res.status(404).send('Mini App not found');
+    }
   });
+  
+  logger.info('Mini App static files configured');
+} else {
+  logger.warn(`Mini App dist folder not found at ${miniAppPath}`);
 }
 
 // Serve SDK Bot Mini App at /sdk
