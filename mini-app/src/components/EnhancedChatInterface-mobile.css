@@ -1,15 +1,71 @@
-/* Mobile-First Enhancements from ZenSis Memory */
+/* Mobile-First Optimized & Compact Design */
 
-/* Context Bar */
+/* Compact Layout Overrides */
+@media (max-width: 768px) {
+  .chat-header {
+    height: 44px !important;
+    padding: 0 8px !important;
+  }
+  
+  .header-title {
+    font-size: 16px !important;
+    font-weight: 600;
+  }
+  
+  .header-subtitle {
+    display: none; /* Hide subtitle for cleaner look */
+  }
+  
+  .agent-role {
+    font-size: 10px !important;
+    opacity: 0.7;
+  }
+  
+  .agent-name {
+    font-size: 14px !important;
+  }
+  
+  /* Compact message bubbles */
+  .message-bubble {
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+    max-width: 85% !important;
+  }
+  
+  .message-timestamp {
+    font-size: 10px !important;
+    margin-top: 4px !important;
+  }
+  
+  /* Smaller avatars in messages */
+  .message-avatar {
+    width: 28px !important;
+    height: 28px !important;
+  }
+  
+  /* Reduce input area padding */
+  .chat-input-wrapper {
+    padding: 8px 12px !important;
+  }
+  
+  .chat-input {
+    font-size: 14px !important;
+    padding: 8px 12px !important;
+    min-height: 36px !important;
+  }
+}
+
+/* Context Bar - Hidden by default for cleaner look */
 .context-bar {
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
-  height: 32px;
+  padding: 0 12px;
+  height: 24px;
   background: var(--bg-secondary);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  font-size: 12px;
+  font-size: 11px;
   overflow: hidden;
 }
 
@@ -62,7 +118,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 56px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -79,8 +135,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 44px;
-  min-width: 44px;
+  height: 40px;
+  min-width: 40px;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -94,8 +150,8 @@
 }
 
 .nav-avatar {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   object-fit: cover;
   opacity: 0.6;

@@ -330,8 +330,8 @@ app.get('/api/chat/history/:userId', checkApiAccess, async (req, res) => {
 // Send message
 app.post('/api/chat/message', checkApiAccess, async (req, res) => {
   try {
-    const { userId, message } = req.body;
-    const response = await cboHandler.processMessage(userId, message);
+    const { userId, message, agent } = req.body;
+    const response = await cboHandler.processMessage(userId, message, agent || 'cbo');
     res.json({ response });
   } catch (error) {
     logger.error('Error processing message:', error);

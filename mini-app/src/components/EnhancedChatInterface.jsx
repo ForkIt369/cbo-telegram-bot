@@ -631,37 +631,47 @@ const EnhancedChatInterface = ({ userId }) => {
               className="welcome-screen"
             >
               <div className="welcome-content">
-                <div className="agents-showcase">
-                  {Object.entries(agents).map(([key, agent], index) => (
-                    <motion.div
-                      key={key}
-                      className="agent-card glass-surface"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      onClick={() => setCurrentAgent(key)}
-                      style={{
-                        borderTop: `3px solid ${agent.color}`,
-                        cursor: 'pointer'
-                      }}
-                      whileHover={{ scale: 1.05, y: -5 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <img src={agent.avatar} alt={agent.name} className="showcase-avatar" />
-                      <h3 style={{ color: agent.color }}>{agent.name}</h3>
-                      <p className="agent-role-text">{agent.role}</p>
-                      <p className="agent-expertise-text">{agent.expertise}</p>
-                    </motion.div>
-                  ))}
-                </div>
+                <motion.div 
+                  className="welcome-hero"
+                  initial={{ scale: 0.9 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <img 
+                    src={agents[currentAgent].avatar} 
+                    alt={agents[currentAgent].name}
+                    className="welcome-avatar"
+                    style={{ 
+                      width: '80px', 
+                      height: '80px',
+                      borderRadius: '50%',
+                      border: `3px solid ${agents[currentAgent].color}`,
+                      boxShadow: `0 0 30px ${agents[currentAgent].glow}`
+                    }}
+                  />
+                  <h2 className="welcome-agent-name" style={{ 
+                    color: agents[currentAgent].color,
+                    fontSize: '24px',
+                    marginTop: '12px'
+                  }}>
+                    {agents[currentAgent].name}
+                  </h2>
+                  <p className="welcome-agent-role" style={{
+                    fontSize: '14px',
+                    opacity: 0.8,
+                    marginTop: '4px'
+                  }}>
+                    {agents[currentAgent].role}
+                  </p>
+                </motion.div>
                 
-                <h1 className="welcome-title">Welcome to BroVerse</h1>
-                <p className="welcome-subtitle">
-                  Select your AI Business Advisor to get started
-                </p>
-                
-                <div className="welcome-cta">
-                  <p>Ask {agents[currentAgent].name} anything about your business challenges!</p>
+                <div className="welcome-cta" style={{ marginTop: '24px' }}>
+                  <p style={{ fontSize: '14px', opacity: 0.9 }}>
+                    Ask me anything about your business challenges!
+                  </p>
+                  <p style={{ fontSize: '12px', opacity: 0.6, marginTop: '8px' }}>
+                    Swipe left/right or use bottom nav to switch advisors
+                  </p>
                 </div>
               </div>
             </motion.div>

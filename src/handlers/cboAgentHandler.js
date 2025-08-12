@@ -2,6 +2,7 @@ const logger = require('../utils/logger');
 const memoryBank = require('../memory/memoryBank');
 const claudeService = require('../services/claudeService');
 const configService = require('../services/configService');
+const { getAgentPrompt, getAgentGreeting } = require('../../agents/agent-personalities');
 // MCP tools moved to experimental - using basic service only
 // const claudeServiceWithTools = require('../services/claudeServiceWithTools');
 
@@ -10,6 +11,7 @@ class CBOAgentHandler {
     this.conversations = new Map();
     this.useTools = process.env.ENABLE_MCP_TOOLS === 'true';
     this.currentConfig = null;
+    this.currentAgent = 'cbo'; // Default agent
     
     // Load initial configuration
     this.loadConfig();
@@ -45,17 +47,29 @@ class CBOAgentHandler {
     }
   }
 
-  async processMessage(userId, message) {
+  async processMessage(userId, message, agentKey = 'cbo') {
     const context = this.getOrCreateContext(userId);
     context.messages.push({ role: 'user', content: message, timestamp: new Date() });
     
     try {
+      // Get agent personality
+      const agentPersonality = getAgentPrompt(agentKey);
+      
       // Use appropriate service based on configuration
       // Always use basic claude service (MCP tools are experimental)
       const service = claudeService;
-      const response = await service.processBusinessQuery(message, context);
+      const response = await service.processBusinessQuery(
+        message, 
+        context, 
+        agentPersonality.systemPrompt
+      );
       
-      context.messages.push({ role: 'assistant', content: response, timestamp: new Date() });
+      context.messages.push({ 
+        role: 'assistant', 
+        content: response, 
+        timestamp: new Date(),
+        agent: agentKey 
+      });
       
       // Save conversation periodically
       if (context.messages.length % 10 === 0) {
@@ -71,9 +85,21 @@ class CBOAgentHandler {
       
       return response;
     } catch (error) {
-      logger.error('Error processing CBO query:', error);
+      logger.error(`Error processing ${agentKey} query:`, error);
       throw error;
     }
+  }
+  
+  // New method to get agent greeting
+  async getAgentGreeting(agentKey = 'cbo') {
+    return getAgentGreeting(agentKey);
+  }
+  
+  // New method to switch agent context
+  async switchAgent(userId, newAgent) {
+    const context = this.getOrCreateContext(userId);
+    context.currentAgent = newAgent;
+    return { success: true, agent: newAgent };
   }
 
   async extractInsights(userId, query, response) {
