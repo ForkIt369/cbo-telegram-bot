@@ -1,0 +1,408 @@
+/* Enhanced Chat Input Styles */
+@import '../styles/design-system.css';
+
+.enhanced-chat-input {
+  position: relative;
+  padding: var(--space-3);
+  background: var(--bg-primary);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all var(--transition-base);
+}
+
+.enhanced-chat-input.expanded {
+  padding-bottom: var(--space-4);
+}
+
+/* Suggestion Pills */
+.suggestion-pills-container {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  overflow-x: auto;
+  padding: var(--space-1) 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.suggestion-pills-container::-webkit-scrollbar {
+  display: none;
+}
+
+.suggestion-pill {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(48, 209, 88, 0.3);
+  background: rgba(48, 209, 88, 0.08);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.suggestion-pill:hover {
+  background: var(--cbo-glass);
+  border-color: var(--cbo-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--cbo-glow);
+}
+
+.suggestion-pill:active {
+  transform: translateY(0);
+}
+
+.pill-icon {
+  font-size: var(--text-base);
+}
+
+.pill-text {
+  font-weight: 500;
+}
+
+/* File Preview */
+.file-preview-container {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+  overflow-x: auto;
+  padding: var(--space-1) 0;
+}
+
+.file-preview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  min-width: 200px;
+  position: relative;
+}
+
+.file-icon {
+  font-size: var(--text-2xl);
+}
+
+.file-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-name {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-size {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+
+.file-remove {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 69, 58, 0.2);
+  border: 1px solid rgba(255, 69, 58, 0.4);
+  color: #FF453A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.file-remove:hover {
+  background: rgba(255, 69, 58, 0.3);
+  transform: scale(1.1);
+}
+
+/* Input Container */
+.input-container {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(22, 27, 34, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all var(--transition-base);
+}
+
+.input-container:focus-within {
+  border-color: var(--cbo-primary);
+  box-shadow: 0 0 20px var(--cbo-glow);
+}
+
+/* Action Buttons */
+.input-actions-left,
+.input-actions-right {
+  display: flex;
+  gap: var(--space-1);
+  align-items: center;
+}
+
+.action-btn {
+  width: var(--touch-min);
+  height: var(--touch-min);
+  border-radius: var(--radius-full);
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: var(--text-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.action-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+.action-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.action-btn.recording {
+  animation: pulse 1.5s infinite;
+  color: var(--state-error);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+/* Input Field */
+.input-field-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+.input-field {
+  width: 100%;
+  min-height: var(--touch-min);
+  max-height: 200px;
+  padding: var(--space-2) var(--space-3);
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  font-family: var(--font-primary);
+  line-height: var(--leading-normal);
+  resize: none;
+  outline: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--cbo-primary) transparent;
+}
+
+.input-field::-webkit-scrollbar {
+  width: 4px;
+}
+
+.input-field::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.input-field::-webkit-scrollbar-thumb {
+  background: var(--cbo-primary);
+  border-radius: var(--radius-full);
+}
+
+.input-field::placeholder {
+  color: var(--text-muted);
+}
+
+/* Character Counter */
+.char-counter {
+  position: absolute;
+  bottom: var(--space-1);
+  right: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  padding: 2px var(--space-1);
+  border-radius: var(--radius-sm);
+}
+
+/* Send Button */
+.send-button {
+  width: var(--touch-safe);
+  height: var(--touch-safe);
+  border-radius: var(--radius-full);
+  background: var(--gradient-cbo);
+  border: none;
+  color: white;
+  font-size: var(--text-xl);
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.send-button:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px var(--cbo-glow);
+}
+
+.send-button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.send-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--bg-tertiary);
+}
+
+.send-icon {
+  transition: transform var(--transition-fast);
+}
+
+.send-button:hover:not(:disabled) .send-icon {
+  transform: translateX(2px);
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Input Hints */
+.input-hints {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-1);
+  padding: 0 var(--space-2);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.enhanced-chat-input:hover .input-hints,
+.enhanced-chat-input:focus-within .input-hints {
+  opacity: 1;
+}
+
+.hint {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* Drag & Drop Overlay */
+.enhanced-chat-input.drag-over::before {
+  content: 'Drop files here';
+  position: absolute;
+  inset: var(--space-3);
+  background: var(--cbo-glass);
+  border: 2px dashed var(--cbo-primary);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-lg);
+  color: var(--cbo-primary);
+  pointer-events: none;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+}
+
+/* Mobile Optimizations */
+@media (max-width: 640px) {
+  .enhanced-chat-input {
+    padding: var(--space-2);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .suggestion-pills-container {
+    margin-bottom: var(--space-2);
+  }
+  
+  .input-container {
+    padding: var(--space-2);
+  }
+  
+  .input-field {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  .input-hints {
+    display: none;
+  }
+  
+  .action-btn {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .send-button {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .loading-spinner {
+    animation: none;
+    opacity: 0.7;
+  }
+  
+  .action-btn.recording {
+    animation: none;
+  }
+}
+
+/* Dark Mode Enhancements */
+@media (prefers-color-scheme: dark) {
+  .input-container {
+    background: rgba(13, 17, 23, 0.8);
+  }
+  
+  .suggestion-pill {
+    background: rgba(48, 209, 88, 0.1);
+  }
+}

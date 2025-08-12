@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { AppRoot } from '@telegram-apps/telegram-ui';
-import ChatInterface from './components/ChatInterface';
+import EnhancedChatInterface from './components/EnhancedChatInterface';
+import './styles/design-system.css';
 
 function App() {
   const [theme, setTheme] = useState('dark');
+  const [isReady, setIsReady] = useState(false);
   
   // Get user ID from Telegram WebApp if available
   const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
@@ -95,19 +97,40 @@ function App() {
       // Enable closing confirmation if needed
       tg.enableClosingConfirmation();
       
+      // Enable haptic feedback on init
+      if (tg.HapticFeedback) {
+        tg.HapticFeedback.impactOccurred('light');
+      }
+      
+      // Mark as ready
+      setIsReady(true);
+      
       // Clean up event listeners
       return () => {
         tg.offEvent('themeChanged', applyThemeColors);
       };
+    } else {
+      // Fallback for non-Telegram environment
+      setIsReady(true);
     }
   }, []);
+  
+  // Show loading spinner while initializing
+  if (!isReady) {
+    return (
+      <div className="app-loading">
+        <div className="loading-spinner" />
+      </div>
+    );
+  }
   
   return (
     <AppRoot
       appearance={theme}
       platform={window.Telegram?.WebApp?.platform || 'ios'}
+      className="app-root enhanced"
     >
-      <ChatInterface userId={userId} />
+      <EnhancedChatInterface userId={userId} />
     </AppRoot>
   );
 }

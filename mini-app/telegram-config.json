@@ -1,0 +1,42 @@
+{
+  "mini_app": {
+    "name": "CBO-Bro Assistant",
+    "short_name": "CBO",
+    "description": "AI-powered Business Optimization Expert",
+    "color_scheme": {
+      "primary": "#30D158",
+      "secondary": "#00C851",
+      "background": "#0A0E14",
+      "text": "#FFFFFF"
+    },
+    "splash_screen": {
+      "show": true,
+      "background_color": "#0A0E14",
+      "icon": "🟢",
+      "title": "CBO-Bro",
+      "subtitle": "Loading BroVerse..."
+    },
+    "header": {
+      "color": "#0D1117",
+      "show_progress": true,
+      "close_button": true
+    },
+    "features": {
+      "haptic_feedback": true,
+      "swipe_behavior": "minimize",
+      "orientation": "portrait",
+      "expand_on_load": true,
+      "enable_closing_confirmation": true
+    },
+    "viewport": {
+      "fullscreen": true,
+      "safe_area_insets": true,
+      "keyboard_resize": false
+    },
+    "performance": {
+      "preload": true,
+      "cache_assets": true,
+      "optimize_animations": true
+    }
+  }
+}
