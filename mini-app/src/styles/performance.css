@@ -1,0 +1,350 @@
+/* Performance-Critical CSS Optimizations */
+
+/* Use CSS containment for better rendering performance */
+.message-bubble {
+  contain: layout style paint;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 100px;
+}
+
+.virtual-message-row {
+  contain: strict;
+  will-change: transform;
+}
+
+/* GPU acceleration for animations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Optimize font loading */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/inter-400.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/inter-600.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Critical CSS for above-the-fold content */
+.enhanced-chat-interface {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #0D1117;
+  position: relative;
+  overflow: hidden;
+  contain: strict;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  height: 44px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  z-index: 100;
+  flex-shrink: 0;
+  contain: layout style;
+}
+
+/* Reduce repaints during scrolling */
+.chat-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  contain: strict;
+}
+
+/* Virtual scrolling container optimizations */
+.virtual-message-list {
+  height: 100%;
+  width: 100%;
+  contain: strict;
+}
+
+.message-list-container {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.message-list-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.message-list-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.message-list-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+/* Optimize animations */
+@media (prefers-reduced-motion: no-preference) {
+  .message {
+    animation: messageSlide 0.2s ease-out;
+  }
+  
+  @keyframes messageSlide {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Error boundary styles */
+.error-boundary-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: var(--bg-primary);
+  padding: 20px;
+}
+
+.error-content {
+  text-align: center;
+  max-width: 400px;
+  padding: 32px;
+  background: var(--bg-secondary);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.error-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.error-content h2 {
+  font-size: 20px;
+  margin: 0 0 12px 0;
+  color: var(--text-primary);
+}
+
+.error-content p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0 0 24px 0;
+}
+
+.error-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.error-reset-btn,
+.error-close-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.error-reset-btn {
+  background: var(--cbo-primary);
+  color: white;
+}
+
+.error-reset-btn:hover {
+  background: var(--cbo-secondary);
+}
+
+.error-close-btn {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+.error-details {
+  margin-top: 24px;
+  text-align: left;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.error-details summary {
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.error-details pre {
+  background: var(--bg-primary);
+  padding: 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: monospace;
+  font-size: 11px;
+}
+
+/* Loading skeleton optimizations */
+.skeleton-message {
+  contain: layout style paint;
+}
+
+.skeleton-line {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Connection status indicator */
+.connection-status {
+  position: fixed;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 1000;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  contain: layout style paint;
+}
+
+.connection-status.connected {
+  background: var(--state-success);
+  color: white;
+  opacity: 0;
+}
+
+.connection-status.connecting {
+  background: var(--state-warning);
+  color: var(--bg-primary);
+  opacity: 1;
+}
+
+.connection-status.disconnected,
+.connection-status.error {
+  background: var(--state-error);
+  color: white;
+  opacity: 1;
+}
+
+.connection-status.reconnecting {
+  background: var(--state-info);
+  color: white;
+  opacity: 1;
+}
+
+/* Streaming indicator */
+.streaming-indicator {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  contain: layout style paint;
+}
+
+.typing-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.typing-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--agent-primary);
+  animation: typingPulse 1.4s infinite;
+  contain: layout style paint;
+}
+
+.typing-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typingPulse {
+  0%, 60%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Mobile-specific performance optimizations */
+@media (max-width: 768px) {
+  /* Reduce backdrop filter on mobile for better performance */
+  .chat-header {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  /* Optimize touch interactions */
+  .message-bubble {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  
+  /* Reduce animation complexity on mobile */
+  @keyframes messageSlide {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
