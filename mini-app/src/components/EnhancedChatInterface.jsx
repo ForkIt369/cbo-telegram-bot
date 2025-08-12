@@ -5,6 +5,46 @@ import EnhancedChatInput from './EnhancedChatInput';
 import FlowIndicator from './FlowIndicator';
 import './EnhancedChatInterface.css';
 
+// Agent configuration
+const agents = {
+  cbo: {
+    name: 'CBO',
+    avatar: '/avatars/cbo-new.png',
+    color: 'var(--cbo-primary)',
+    glow: 'var(--cbo-glow)',
+    role: 'Chief Bro Officer',
+    expertise: 'Business optimization & Four Flows analysis',
+    personality: 'Strategic, data-driven, results-focused'
+  },
+  bigsis: {
+    name: 'Big Sis',
+    avatar: '/avatars/bigsis.png',
+    color: 'var(--bigsis-primary)',
+    glow: 'var(--bigsis-glow)',
+    role: 'Strategic Wisdom',
+    expertise: 'Long-term planning & risk management',
+    personality: 'Wise, patient, forward-thinking'
+  },
+  bro: {
+    name: 'Bro',
+    avatar: '/avatars/bro.png',
+    color: 'var(--bro-primary)',
+    glow: 'var(--bro-glow)',
+    role: 'Execution Excellence',
+    expertise: 'Operations & rapid implementation',
+    personality: 'Energetic, action-oriented, supportive'
+  },
+  lilsis: {
+    name: 'Lil Sis',
+    avatar: '/avatars/lilsis.png',
+    color: 'var(--lilsis-primary)',
+    glow: 'var(--lilsis-glow)',
+    role: 'Creative Innovation',
+    expertise: 'Disruption & new opportunities',
+    personality: 'Creative, innovative, boundary-pushing'
+  }
+};
+
 // WebSocket hook for real-time updates
 const useWebSocket = (userId, onMessage) => {
   const wsRef = useRef(null);
@@ -78,6 +118,8 @@ const useWebSocket = (userId, onMessage) => {
 const EnhancedChatInterface = ({ userId }) => {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentAgent, setCurrentAgent] = useState('cbo');
+  const [showAgentSelector, setShowAgentSelector] = useState(false);
   const [activeFlow, setActiveFlow] = useState(null);
   const [userTyping, setUserTyping] = useState(false);
   const [aiTyping, setAiTyping] = useState(false);
@@ -109,7 +151,8 @@ const EnhancedChatInterface = ({ userId }) => {
       const newMessage = {
         id: `ws-${Date.now()}`,
         ...data.message,
-        timestamp: data.message.timestamp || new Date().toISOString()
+        timestamp: data.message.timestamp || new Date().toISOString(),
+        agent: currentAgent
       };
       setMessages(prev => [...prev, newMessage]);
       setAiTyping(false);
@@ -118,7 +161,7 @@ const EnhancedChatInterface = ({ userId }) => {
     } else if (data.type === 'flow_update') {
       setActiveFlow(data.flow);
     }
-  }, []);
+  }, [currentAgent]);
 
   // Initialize WebSocket connection
   const { connectionStatus: wsStatus, sendMessage: wsSendMessage } = useWebSocket(userId, handleWebSocketMessage);
@@ -143,7 +186,8 @@ const EnhancedChatInterface = ({ userId }) => {
         setMessages(data.messages.map(msg => ({
           ...msg,
           timestamp: msg.timestamp || new Date().toISOString(),
-          flow: detectFlow(msg.content)
+          flow: detectFlow(msg.content),
+          agent: msg.agent || 'cbo'
         })));
         setShowWelcome(false);
       }
@@ -188,7 +232,8 @@ const EnhancedChatInterface = ({ userId }) => {
           type: 'message',
           userId,
           message,
-          files
+          files,
+          agent: currentAgent
         });
       } else {
         // Fallback to HTTP
@@ -198,7 +243,8 @@ const EnhancedChatInterface = ({ userId }) => {
           body: JSON.stringify({
             userId,
             message,
-            files
+            files,
+            agent: currentAgent
           })
         });
 
@@ -210,7 +256,8 @@ const EnhancedChatInterface = ({ userId }) => {
           content: data.response,
           flow: detectFlow(data.response),
           citations: data.citations || [],
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          agent: currentAgent
         };
 
         setMessages(prev => [...prev, assistantMessage]);
@@ -223,7 +270,8 @@ const EnhancedChatInterface = ({ userId }) => {
         role: 'assistant',
         content: 'Sorry, I encountered an error. Please try again.',
         timestamp: new Date().toISOString(),
-        isError: true
+        isError: true,
+        agent: currentAgent
       };
       
       setMessages(prev => [...prev, errorMessage]);
@@ -252,17 +300,81 @@ const EnhancedChatInterface = ({ userId }) => {
 
   return (
     <div className="enhanced-chat-interface">
-      {/* Header */}
-      <header className="chat-header glass-surface">
+      {/* Header with Agent Selector */}
+      <header className="chat-header glass-surface" style={{
+        borderBottom: `2px solid ${agents[currentAgent].color}`,
+        background: `linear-gradient(135deg, ${agents[currentAgent].glow} 0%, transparent 60%)`
+      }}>
         <div className="header-left">
-          <div className="agent-avatar">
-            <span className="avatar-emoji">🟢</span>
-            <span className={`status-indicator ${connectionStatus}`} />
+          <div className="agent-selector-container">
+            <button 
+              className="current-agent-btn"
+              onClick={() => setShowAgentSelector(!showAgentSelector)}
+              style={{
+                background: `linear-gradient(135deg, ${agents[currentAgent].color} 0%, ${agents[currentAgent].glow} 100%)`,
+                boxShadow: `0 4px 24px ${agents[currentAgent].glow}`
+              }}
+            >
+              <img 
+                src={agents[currentAgent].avatar} 
+                alt={agents[currentAgent].name}
+                className="agent-avatar"
+              />
+              <div className="agent-info">
+                <span className="agent-name">{agents[currentAgent].name}</span>
+                <span className="agent-role">{agents[currentAgent].role}</span>
+              </div>
+              <motion.span 
+                className="switch-indicator"
+                animate={{ rotate: showAgentSelector ? 180 : 0 }}
+              >
+                ▼
+              </motion.span>
+            </button>
+            
+            <AnimatePresence>
+              {showAgentSelector && (
+                <motion.div 
+                  className="agent-selector glass-surface"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                >
+                  {Object.entries(agents).map(([key, agent]) => (
+                    <motion.button
+                      key={key}
+                      className={`agent-option ${key === currentAgent ? 'active' : ''}`}
+                      onClick={() => {
+                        setCurrentAgent(key);
+                        setShowAgentSelector(false);
+                        // Haptic feedback
+                        if (window.Telegram?.WebApp?.HapticFeedback) {
+                          window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                        }
+                      }}
+                      style={{
+                        borderLeft: `3px solid ${agent.color}`,
+                        background: key === currentAgent ? agent.glow : 'transparent'
+                      }}
+                      whileHover={{ scale: 1.02, x: 4 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <img src={agent.avatar} alt={agent.name} className="option-avatar" />
+                      <div className="option-info">
+                        <div className="option-name">{agent.name}</div>
+                        <div className="option-expertise">{agent.expertise}</div>
+                      </div>
+                    </motion.button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
+          
           <div className="header-info">
-            <h1 className="header-title">CBO-Bro</h1>
+            <h1 className="header-title">BroVerse Optimizer</h1>
             <div className="header-subtitle">
-              Business Optimization Expert
+              {agents[currentAgent].personality}
               {connectionStatus === 'offline' && (
                 <span className="offline-badge">Offline Mode</span>
               )}
@@ -273,23 +385,27 @@ const EnhancedChatInterface = ({ userId }) => {
         <FlowIndicator activeFlow={activeFlow} />
         
         <div className="header-actions">
-          <button
+          <motion.button
             className="action-icon-btn"
             onClick={() => {
               setMessages([]);
               setShowWelcome(true);
             }}
             aria-label="Clear chat"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
           >
             🗑️
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             className="action-icon-btn"
             onClick={() => window.Telegram?.WebApp?.close()}
             aria-label="Close"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
           >
             ✕
-          </button>
+          </motion.button>
         </div>
       </header>
 
@@ -305,20 +421,33 @@ const EnhancedChatInterface = ({ userId }) => {
               className="welcome-screen"
             >
               <div className="welcome-content">
-                <div className="cbo-logo-container">
-                  <div className="cbo-cube">
-                    <div className="cube-face front">CBO</div>
-                    <div className="cube-face back">BRO</div>
-                    <div className="cube-face left">💎</div>
-                    <div className="cube-face right">💰</div>
-                    <div className="cube-face top">⚡</div>
-                    <div className="cube-face bottom">📊</div>
-                  </div>
+                <div className="agents-showcase">
+                  {Object.entries(agents).map(([key, agent], index) => (
+                    <motion.div
+                      key={key}
+                      className="agent-card glass-surface"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      onClick={() => setCurrentAgent(key)}
+                      style={{
+                        borderTop: `3px solid ${agent.color}`,
+                        cursor: 'pointer'
+                      }}
+                      whileHover={{ scale: 1.05, y: -5 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <img src={agent.avatar} alt={agent.name} className="showcase-avatar" />
+                      <h3 style={{ color: agent.color }}>{agent.name}</h3>
+                      <p className="agent-role-text">{agent.role}</p>
+                      <p className="agent-expertise-text">{agent.expertise}</p>
+                    </motion.div>
+                  ))}
                 </div>
                 
-                <h1 className="welcome-title">Welcome to CBO-Bro</h1>
+                <h1 className="welcome-title">Welcome to BroVerse</h1>
                 <p className="welcome-subtitle">
-                  Your AI-powered business optimization expert using the BroVerse Biz Mental Model™
+                  Select an AI agent above and optimize your business with the BBMM™ Four Flows
                 </p>
                 
                 <div className="four-flows-grid">
@@ -364,7 +493,7 @@ const EnhancedChatInterface = ({ userId }) => {
                 </div>
                 
                 <div className="welcome-cta">
-                  <p>Ask me anything about your business challenges!</p>
+                  <p>Ask {agents[currentAgent].name} anything about your business challenges!</p>
                 </div>
               </div>
             </motion.div>
@@ -378,6 +507,7 @@ const EnhancedChatInterface = ({ userId }) => {
               <EnhancedMessageList 
                 messages={messages} 
                 isStreaming={aiTyping}
+                currentAgent={agents[currentAgent]}
               />
               <div ref={messagesEndRef} />
             </motion.div>
@@ -390,8 +520,9 @@ const EnhancedChatInterface = ({ userId }) => {
         <EnhancedChatInput
           onSendMessage={handleSendMessage}
           isLoading={isLoading}
-          placeholder={showWelcome ? "Start with 'How can I improve customer retention?'" : "Ask CBO-Bro anything..."}
+          placeholder={showWelcome ? `Ask ${agents[currentAgent].name} to analyze your business...` : `Message ${agents[currentAgent].name}...`}
           onTyping={handleUserTyping}
+          currentAgent={agents[currentAgent]}
         />
       </div>
     </div>

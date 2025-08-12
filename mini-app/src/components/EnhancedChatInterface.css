@@ -26,22 +26,127 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  flex: 1;
+}
+
+/* Agent Selector Container */
+.agent-selector-container {
+  position: relative;
+}
+
+.current-agent-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: white;
+  font-weight: 600;
+  min-width: 200px;
+}
+
+.current-agent-btn:hover {
+  transform: translateY(-2px);
 }
 
 .agent-avatar {
-  position: relative;
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--gradient-cbo);
-  border-radius: var(--radius-full);
-  box-shadow: 0 0 20px var(--cbo-glow);
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  background: white;
+  padding: 2px;
 }
 
-.avatar-emoji {
-  font-size: 24px;
+.agent-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+}
+
+.agent-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+}
+
+.agent-role {
+  font-size: 11px;
+  opacity: 0.9;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.switch-indicator {
+  font-size: 12px;
+  opacity: 0.7;
+  transition: transform 0.3s ease;
+}
+
+/* Agent Selector Dropdown */
+.agent-selector {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  left: 0;
+  min-width: 280px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(22, 27, 34, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.agent-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: transparent;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-primary);
+  text-align: left;
+}
+
+.agent-option:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.agent-option.active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.option-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  background: white;
+  padding: 2px;
+}
+
+.option-info {
+  flex: 1;
+}
+
+.option-name {
+  font-size: 14px;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.option-expertise {
+  font-size: 11px;
+  opacity: 0.7;
+  display: block;
 }
 
 .status-indicator {
@@ -142,8 +247,68 @@
 }
 
 .welcome-content {
-  max-width: 600px;
+  max-width: 800px;
   text-align: center;
+}
+
+/* Agents Showcase */
+.agents-showcase {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.agent-card {
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.agent-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: inherit;
+}
+
+.showcase-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  margin: 0 auto var(--space-3);
+  background: white;
+  padding: 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.agent-card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 var(--space-1) 0;
+}
+
+.agent-role-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-1) 0;
+}
+
+.agent-expertise-text {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin: 0;
+  line-height: 1.4;
 }
 
 /* 3D CBO Cube */
@@ -303,13 +468,36 @@
     font-size: var(--text-xs);
   }
   
-  .agent-avatar {
-    width: 40px;
-    height: 40px;
+  .current-agent-btn {
+    min-width: 160px;
+    padding: var(--space-1) var(--space-2);
   }
   
-  .avatar-emoji {
-    font-size: 20px;
+  .agent-avatar {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .agent-name {
+    font-size: 13px;
+  }
+  
+  .agent-role {
+    font-size: 10px;
+  }
+  
+  .agents-showcase {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-2);
+  }
+  
+  .showcase-avatar {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .agent-card {
+    padding: var(--space-3);
   }
   
   .chat-content {

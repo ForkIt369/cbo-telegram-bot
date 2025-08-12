@@ -35,14 +35,24 @@
 
 /* Message Avatar */
 .message-avatar {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--gradient-cbo);
   flex-shrink: 0;
+}
+
+.message-agent-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  background: white;
+  padding: 2px;
+  border: 2px solid;
+  transition: all 0.2s ease;
 }
 
 .avatar-emoji {

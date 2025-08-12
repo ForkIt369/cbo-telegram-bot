@@ -89,7 +89,7 @@ const Citation = ({ citation, index }) => {
 };
 
 // Individual message component with virtual rendering support
-const Message = memo(({ message, isStreaming = false, agentColor = 'cbo' }) => {
+const Message = memo(({ message, isStreaming = false, currentAgent }) => {
   const [chunks, setChunks] = useState([]);
   const [streamComplete, setStreamComplete] = useState(!isStreaming);
 
@@ -116,15 +116,8 @@ const Message = memo(({ message, isStreaming = false, agentColor = 'cbo' }) => {
     });
   };
 
-  const getAgentAvatar = (role) => {
-    if (role === 'user') return '👤';
-    switch(agentColor) {
-      case 'bigsis': return '🔵';
-      case 'bro': return '🟠';
-      case 'lilsis': return '🟣';
-      default: return '🟢';
-    }
-  };
+  const agentKey = message.agent || 'cbo';
+  const agentInfo = currentAgent || { name: 'CBO', color: 'var(--cbo-primary)' };
 
   return (
     <motion.div
@@ -133,17 +126,29 @@ const Message = memo(({ message, isStreaming = false, agentColor = 'cbo' }) => {
       transition={{ duration: 0.233 }}
       className={`message-container ${message.role}`}
     >
-      {message.role === 'assistant' && (
+      {message.role === 'assistant' && currentAgent && (
         <div className="message-avatar">
-          <span className="avatar-emoji">{getAgentAvatar(message.role)}</span>
+          <img 
+            src={currentAgent.avatar} 
+            alt={currentAgent.name}
+            className="message-agent-avatar"
+            style={{ 
+              borderColor: currentAgent.color,
+              boxShadow: `0 2px 8px ${currentAgent.glow}`
+            }}
+          />
         </div>
       )}
       
-      <div className={`message-bubble glass-surface glow-${agentColor}`}>
+      <div className={`message-bubble glass-surface`} style={{
+        borderLeft: message.role === 'assistant' ? `2px solid ${agentInfo.color}` : 'none'
+      }}>
         {message.role === 'assistant' && (
           <div className="message-header">
-            <span className={`agent-badge badge-${agentColor}`}>
-              CBO
+            <span className="agent-badge" style={{
+              background: `linear-gradient(135deg, ${agentInfo.color}, ${agentInfo.glow || agentInfo.color})`
+            }}>
+              {agentInfo.name}
             </span>
             {message.flow && (
               <span className="flow-indicator">
@@ -239,7 +244,7 @@ const VirtualScrollContainer = ({ messages, height = 600 }) => {
 };
 
 // Main EnhancedMessageList component
-const EnhancedMessageList = ({ messages, isStreaming = false }) => {
+const EnhancedMessageList = ({ messages, isStreaming = false, currentAgent }) => {
   const containerRef = useRef();
   const [enableVirtualScroll, setEnableVirtualScroll] = useState(false);
 
@@ -256,7 +261,7 @@ const EnhancedMessageList = ({ messages, isStreaming = false }) => {
   }, [messages, enableVirtualScroll]);
 
   if (enableVirtualScroll) {
-    return <VirtualScrollContainer messages={messages} />;
+    return <VirtualScrollContainer messages={messages} currentAgent={currentAgent} />;
   }
 
   return (
@@ -267,6 +272,7 @@ const EnhancedMessageList = ({ messages, isStreaming = false }) => {
             key={message.id} 
             message={message}
             isStreaming={isStreaming && index === messages.length - 1 && message.role === 'assistant'}
+            currentAgent={currentAgent}
           />
         ))}
       </AnimatePresence>
