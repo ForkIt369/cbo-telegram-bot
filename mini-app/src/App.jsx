@@ -1,150 +1,185 @@
-import React, { useEffect, useState, lazy, Suspense } from 'react';
-import './styles/design-system.css';
-import './styles/performance.css';
+import React, { useState, useEffect } from 'react';
+import './App.css';
 
-// Lazy load the main interface for better initial load
-const OptimizedChatInterface = lazy(() => import('./components/OptimizedChatInterface').catch(() => {
-  // Fallback to simple chat interface if optimized version fails
-  console.warn('Failed to load OptimizedChatInterface, falling back to SimpleChatInterface');
-  return import('./components/SimpleChatInterface');
-}));
-
-function App() {
-  const [theme, setTheme] = useState('dark');
-  const [isReady, setIsReady] = useState(false);
+const App = () => {
+  const [messages, setMessages] = useState([]);
+  const [inputValue, setInputValue] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentAgent, setCurrentAgent] = useState('cbo');
   
-  // Get user ID from Telegram WebApp if available
-  const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
-  
+  // Initialize Telegram WebApp
   useEffect(() => {
-    // Initialize Telegram WebApp
     if (window.Telegram?.WebApp) {
       const tg = window.Telegram.WebApp;
-      
-      // Ready the app
       tg.ready();
-      
-      // Expand to full height
       tg.expand();
       
-      // Apply Telegram theme colors
-      const applyThemeColors = () => {
-        const themeParams = tg.themeParams;
-        const root = document.documentElement;
-        
-        // Map Telegram theme colors to CSS variables
-        if (themeParams.bg_color) {
-          root.style.setProperty('--tg-theme-bg-color', themeParams.bg_color);
-        }
-        if (themeParams.text_color) {
-          root.style.setProperty('--tg-theme-text-color', themeParams.text_color);
-        }
-        if (themeParams.hint_color) {
-          root.style.setProperty('--tg-theme-hint-color', themeParams.hint_color);
-        }
-        if (themeParams.link_color) {
-          root.style.setProperty('--tg-theme-link-color', themeParams.link_color);
-        }
-        if (themeParams.button_color) {
-          root.style.setProperty('--tg-theme-button-color', themeParams.button_color);
-        }
-        if (themeParams.button_text_color) {
-          root.style.setProperty('--tg-theme-button-text-color', themeParams.button_text_color);
-        }
-        if (themeParams.secondary_bg_color) {
-          root.style.setProperty('--tg-theme-secondary-bg-color', themeParams.secondary_bg_color);
-        }
-        if (themeParams.header_bg_color) {
-          root.style.setProperty('--tg-theme-header-bg-color', themeParams.header_bg_color);
-        }
-        if (themeParams.accent_text_color) {
-          root.style.setProperty('--tg-theme-accent-text-color', themeParams.accent_text_color);
-        }
-        if (themeParams.section_bg_color) {
-          root.style.setProperty('--tg-theme-section-bg-color', themeParams.section_bg_color);
-        }
-        if (themeParams.section_header_text_color) {
-          root.style.setProperty('--tg-theme-section-header-text-color', themeParams.section_header_text_color);
-        }
-        if (themeParams.subtitle_text_color) {
-          root.style.setProperty('--tg-theme-subtitle-text-color', themeParams.subtitle_text_color);
-        }
-        if (themeParams.destructive_text_color) {
-          root.style.setProperty('--tg-theme-destructive-text-color', themeParams.destructive_text_color);
-        }
-        
-        // Detect theme mode
-        const isDark = tg.colorScheme === 'dark';
-        setTheme(isDark ? 'dark' : 'light');
-        root.setAttribute('data-theme', isDark ? 'dark' : 'light');
-      };
-      
-      // Apply initial theme
-      applyThemeColors();
-      
-      // Listen for theme changes
-      tg.onEvent('themeChanged', applyThemeColors);
-      
-      // Set viewport settings
-      const viewport = tg.viewportHeight;
-      const root = document.documentElement;
-      if (viewport) {
-        root.style.setProperty('--tg-viewport-height', `${viewport}px`);
-      }
-      
-      // Handle viewport changes
-      tg.onEvent('viewportChanged', ({ isStateStable }) => {
-        if (isStateStable) {
-          const newViewport = tg.viewportHeight;
-          document.documentElement.style.setProperty('--tg-viewport-height', `${newViewport}px`);
-        }
-      });
-      
-      // Enable closing confirmation if needed
-      tg.enableClosingConfirmation();
-      
-      // Enable haptic feedback on init
-      if (tg.HapticFeedback) {
-        tg.HapticFeedback.impactOccurred('light');
-      }
-      
-      // Mark as ready
-      setIsReady(true);
-      
-      // Clean up event listeners
-      return () => {
-        tg.offEvent('themeChanged', applyThemeColors);
-      };
-    } else {
-      // Fallback for non-Telegram environment
-      setIsReady(true);
+      // Apply theme
+      document.body.style.backgroundColor = tg.backgroundColor || '#0D1117';
+      document.body.style.color = tg.themeParams?.text_color || '#ffffff';
     }
   }, []);
-  
-  // Show loading spinner while initializing
-  if (!isReady) {
-    return (
-      <div className="app-loading">
-        <div className="loading-spinner" />
-      </div>
-    );
-  }
-  
+
+  const agents = {
+    cbo: { name: 'CBO', color: '#30D158', emoji: '🎯' },
+    bro: { name: 'Bro', color: '#FF9500', emoji: '💪' },
+    bigsis: { name: 'Big Sis', color: '#00D4FF', emoji: '🧠' },
+    lilsis: { name: 'Lil Sis', color: '#9D4EDD', emoji: '✨' }
+  };
+
+  const sendMessage = async () => {
+    if (!inputValue.trim() || isLoading) return;
+
+    const userMessage = {
+      id: `user-${Date.now()}`,
+      role: 'user',
+      content: inputValue,
+      timestamp: new Date().toISOString()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInputValue('');
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('/api/chat/message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: inputValue,
+          agent: currentAgent,
+          userId: window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 'web-user'
+        })
+      });
+
+      if (!response.ok) throw new Error('Failed to send message');
+      
+      const data = await response.json();
+      
+      const assistantMessage = {
+        id: `assistant-${Date.now()}`,
+        role: 'assistant',
+        content: data.response || data.message || 'No response',
+        agent: currentAgent,
+        timestamp: new Date().toISOString()
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error('Error:', error);
+      const errorMessage = {
+        id: `error-${Date.now()}`,
+        role: 'assistant',
+        content: 'Sorry, I encountered an error. Please try again.',
+        agent: currentAgent,
+        timestamp: new Date().toISOString()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
   return (
-    <div 
-      className={`app-root enhanced telegram-app theme-${theme}`}
-      data-platform={window.Telegram?.WebApp?.platform || 'ios'}
-    >
-      <Suspense fallback={
-        <div className="app-loading">
-          <div className="loading-spinner" />
-          <p style={{ marginTop: '16px', opacity: 0.7 }}>Loading BroVerse...</p>
+    <div className="app-container">
+      {/* Header */}
+      <div className="app-header">
+        <h1>BroVerse Chat</h1>
+        <div className="agent-selector">
+          {Object.entries(agents).map(([key, agent]) => (
+            <button
+              key={key}
+              className={`agent-btn ${currentAgent === key ? 'active' : ''}`}
+              onClick={() => setCurrentAgent(key)}
+              style={{
+                '--agent-color': agent.color,
+                backgroundColor: currentAgent === key ? agent.color : 'transparent',
+                color: currentAgent === key ? '#fff' : agent.color,
+                borderColor: agent.color
+              }}
+            >
+              <span>{agent.emoji}</span>
+              <span>{agent.name}</span>
+            </button>
+          ))}
         </div>
-      }>
-        <OptimizedChatInterface userId={userId} />
-      </Suspense>
+      </div>
+
+      {/* Messages */}
+      <div className="messages-container">
+        {messages.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-icon">{agents[currentAgent].emoji}</div>
+            <p>Start a conversation with {agents[currentAgent].name}</p>
+          </div>
+        ) : (
+          messages.map((msg) => (
+            <div
+              key={msg.id}
+              className={`message ${msg.role}`}
+              style={{
+                '--msg-color': msg.role === 'assistant' ? agents[msg.agent || currentAgent].color : '#667eea'
+              }}
+            >
+              {msg.role === 'assistant' && (
+                <div className="agent-avatar">
+                  {agents[msg.agent || currentAgent].emoji}
+                </div>
+              )}
+              <div className="message-bubble">
+                <div className="message-content">{msg.content}</div>
+                <div className="message-time">
+                  {new Date(msg.timestamp).toLocaleTimeString()}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+        {isLoading && (
+          <div className="message assistant">
+            <div className="agent-avatar">{agents[currentAgent].emoji}</div>
+            <div className="message-bubble">
+              <div className="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Input */}
+      <div className="input-container">
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyPress={handleKeyPress}
+          placeholder={`Message ${agents[currentAgent].name}...`}
+          disabled={isLoading}
+          className="message-input"
+        />
+        <button
+          onClick={sendMessage}
+          disabled={!inputValue.trim() || isLoading}
+          className="send-button"
+          style={{ backgroundColor: agents[currentAgent].color }}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M2 21l21-9L2 3v7l15 2-15 2v7z" fill="currentColor"/>
+          </svg>
+        </button>
+      </div>
     </div>
   );
-}
+};
 
 export default App;
