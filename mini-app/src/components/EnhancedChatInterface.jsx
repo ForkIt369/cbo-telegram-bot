@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import EnhancedMessageList from './EnhancedMessageList';
 import EnhancedChatInput from './EnhancedChatInput';
 import FlowIndicator from './FlowIndicator';
+import AgentToolPanel from './AgentToolPanel';
 import './EnhancedChatInterface.css';
+import './EnhancedChatInterface-mobile.css';
 
 // Agent configuration
 const agents = {
@@ -116,17 +118,36 @@ const useWebSocket = (userId, onMessage) => {
 
 // Enhanced Chat Interface Component
 const EnhancedChatInterface = ({ userId }) => {
+  // Thread management for separate conversations per agent
+  const [threads, setThreads] = useState({
+    cbo: [],
+    bigsis: [],
+    bro: [],
+    lilsis: [],
+    shared: [] // Cross-agent important messages
+  });
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [currentAgent, setCurrentAgent] = useState('cbo');
   const [showAgentSelector, setShowAgentSelector] = useState(false);
+  const [showToolPanel, setShowToolPanel] = useState(false);
   const [activeFlow, setActiveFlow] = useState(null);
   const [userTyping, setUserTyping] = useState(false);
   const [aiTyping, setAiTyping] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
   const [connectionStatus, setConnectionStatus] = useState('online');
+  const [viewMode, setViewMode] = useState('single'); // 'single', 'split', 'unified'
+  const [selectedTool, setSelectedTool] = useState(null);
+  const [isListening, setIsListening] = useState(false);
+  const [voiceTranscript, setVoiceTranscript] = useState('');
+  const recognitionRef = useRef(null);
+  
+  // Swipe gesture values
+  const dragX = useMotionValue(0);
+  const backgroundOpacity = useTransform(dragX, [-100, 0, 100], [0.3, 0, 0.3]);
   
   const messagesEndRef = useRef(null);
+  const containerRef = useRef(null);
 
   // Flow detection logic
   const detectFlow = (text) => {
@@ -170,6 +191,9 @@ const EnhancedChatInterface = ({ userId }) => {
     setConnectionStatus(wsStatus === 'connected' ? 'online' : 'offline');
   }, [wsStatus]);
 
+  // State for initial loading
+  const [initialLoading, setInitialLoading] = useState(true);
+  
   // Load initial messages
   useEffect(() => {
     if (userId) {
@@ -178,6 +202,7 @@ const EnhancedChatInterface = ({ userId }) => {
   }, [userId]);
 
   const loadChatHistory = async () => {
+    setInitialLoading(true);
     try {
       const response = await fetch(`/api/chat/history/${userId}`);
       const data = await response.json();
@@ -193,6 +218,8 @@ const EnhancedChatInterface = ({ userId }) => {
       }
     } catch (error) {
       console.error('Failed to load chat history:', error);
+    } finally {
+      setInitialLoading(false);
     }
   };
 
@@ -293,10 +320,151 @@ const EnhancedChatInterface = ({ userId }) => {
     }
   };
 
+  // Thread management functions
+  const switchThread = useCallback((newAgent) => {
+    // Save current thread
+    setThreads(prev => ({
+      ...prev,
+      [currentAgent]: messages
+    }));
+    
+    // Load new thread
+    const newThread = threads[newAgent] || [];
+    setMessages(newThread);
+    setCurrentAgent(newAgent);
+    
+    // Transfer context - last 3 messages to shared
+    if (messages.length > 0) {
+      const contextMessages = messages.slice(-3);
+      setThreads(prev => ({
+        ...prev,
+        shared: [...prev.shared, ...contextMessages]
+      }));
+    }
+    
+    // Dynamic theme switching
+    document.documentElement.setAttribute('data-agent', newAgent);
+    
+    // Haptic feedback
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+      window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+    }
+  }, [currentAgent, messages, threads]);
+  
+  // Handle tool selection
+  const handleToolSelect = useCallback((tool) => {
+    // Insert tool command into message
+    const toolCommand = `/${tool.action}`;
+    
+    // Send as a message
+    handleSendMessage({ 
+      message: `${toolCommand} - ${tool.description}`,
+      files: []
+    });
+    
+    // Close tool panel
+    setShowToolPanel(false);
+    
+    // Track tool usage
+    if (window.Telegram?.WebApp) {
+      window.Telegram.WebApp.sendData(JSON.stringify({
+        action: 'tool_used',
+        tool: tool.id,
+        agent: currentAgent
+      }));
+    }
+  }, [currentAgent, handleSendMessage]);
+  
+  // Swipe gesture handlers
+  const handleDragEnd = useCallback((event, info) => {
+    const threshold = 100;
+    const velocity = info.velocity.x;
+    const offset = info.offset.x;
+    
+    if (Math.abs(offset) > threshold || Math.abs(velocity) > 500) {
+      const agentOrder = ['bigsis', 'cbo', 'bro', 'lilsis'];
+      const currentIndex = agentOrder.indexOf(currentAgent);
+      
+      if (offset > 0 && currentIndex > 0) {
+        // Swipe right - previous agent
+        switchThread(agentOrder[currentIndex - 1]);
+      } else if (offset < 0 && currentIndex < agentOrder.length - 1) {
+        // Swipe left - next agent
+        switchThread(agentOrder[currentIndex + 1]);
+      }
+    }
+  }, [currentAgent, switchThread]);
+  
   // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+  
+  // Initialize agent theme
+  useEffect(() => {
+    document.documentElement.setAttribute('data-agent', currentAgent);
+  }, [currentAgent]);
+  
+  // Voice control functions
+  const startVoiceRecognition = useCallback(() => {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert('Voice recognition is not supported in your browser');
+      return;
+    }
+    
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognitionRef.current = new SpeechRecognition();
+    recognitionRef.current.continuous = true;
+    recognitionRef.current.interimResults = true;
+    recognitionRef.current.lang = 'en-US';
+    
+    recognitionRef.current.onstart = () => {
+      setIsListening(true);
+      setVoiceTranscript('');
+      // Haptic feedback
+      if (window.Telegram?.WebApp?.HapticFeedback) {
+        window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+      }
+    };
+    
+    recognitionRef.current.onresult = (event) => {
+      let finalTranscript = '';
+      let interimTranscript = '';
+      
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript;
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+      
+      setVoiceTranscript(finalTranscript || interimTranscript);
+    };
+    
+    recognitionRef.current.onerror = (event) => {
+      console.error('Speech recognition error:', event.error);
+      setIsListening(false);
+    };
+    
+    recognitionRef.current.onend = () => {
+      setIsListening(false);
+      if (voiceTranscript) {
+        handleSendMessage({ message: voiceTranscript, files: [] });
+        setVoiceTranscript('');
+      }
+    };
+    
+    recognitionRef.current.start();
+  }, [voiceTranscript, handleSendMessage]);
+  
+  const stopVoiceRecognition = useCallback(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+  }, []);
 
   return (
     <div className="enhanced-chat-interface">
@@ -408,9 +576,51 @@ const EnhancedChatInterface = ({ userId }) => {
           </motion.button>
         </div>
       </header>
+      
+      {/* Tool Panel */}
+      <AgentToolPanel 
+        currentAgent={currentAgent}
+        onToolSelect={handleToolSelect}
+        isExpanded={showToolPanel}
+      />
+      
+      {/* Context Bar for Thread Info */}
+      <motion.div 
+        className="context-bar glass-surface"
+        initial={{ height: 0 }}
+        animate={{ height: viewMode !== 'single' ? 32 : 0 }}
+      >
+        <div className="thread-info">
+          <span className="thread-label">Thread:</span>
+          <span className="thread-name">{agents[currentAgent].name}</span>
+          <span className="thread-count">{messages.length} messages</span>
+        </div>
+        <div className="view-mode-toggle">
+          <button 
+            className={viewMode === 'single' ? 'active' : ''}
+            onClick={() => setViewMode('single')}
+          >Single</button>
+          <button 
+            className={viewMode === 'split' ? 'active' : ''}
+            onClick={() => setViewMode('split')}
+          >Split</button>
+          <button 
+            className={viewMode === 'unified' ? 'active' : ''}
+            onClick={() => setViewMode('unified')}
+          >Unified</button>
+        </div>
+      </motion.div>
 
-      {/* Messages Area */}
-      <div className="chat-content">
+      {/* Messages Area with Swipe Gestures */}
+      <motion.div 
+        className="chat-content"
+        ref={containerRef}
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.2}
+        onDragEnd={handleDragEnd}
+        style={{ x: dragX }}
+      >
         <AnimatePresence mode="wait">
           {showWelcome && messages.length === 0 ? (
             <motion.div
@@ -467,12 +677,116 @@ const EnhancedChatInterface = ({ userId }) => {
                 isStreaming={aiTyping}
                 currentAgent={agents[currentAgent]}
               />
+              
+              {/* Skeleton Loading State */}
+              {isLoading && (
+                <div className="skeleton-message">
+                  <div className="skeleton-avatar pulse"></div>
+                  <div className="skeleton-content">
+                    <div className="skeleton-line pulse" style={{ width: '80%' }}></div>
+                    <div className="skeleton-line pulse" style={{ width: '60%' }}></div>
+                    <div className="skeleton-line pulse" style={{ width: '70%' }}></div>
+                  </div>
+                </div>
+              )}
+              
               <div ref={messagesEndRef} />
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </motion.div>
 
+      {/* Bottom Navigation with Tools Toggle */}
+      <div className="bottom-navigation glass-surface">
+        <motion.button
+          className="nav-btn"
+          onClick={() => switchThread('bigsis')}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          style={{ 
+            color: currentAgent === 'bigsis' ? agents.bigsis.color : 'var(--text-secondary)'
+          }}
+        >
+          <img src={agents.bigsis.avatar} alt="Big Sis" className="nav-avatar" />
+        </motion.button>
+        
+        <motion.button
+          className="nav-btn"
+          onClick={() => switchThread('cbo')}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          style={{ 
+            color: currentAgent === 'cbo' ? agents.cbo.color : 'var(--text-secondary)'
+          }}
+        >
+          <img src={agents.cbo.avatar} alt="CBO" className="nav-avatar" />
+        </motion.button>
+        
+        <motion.button
+          className="nav-btn tools-toggle"
+          onClick={() => setShowToolPanel(!showToolPanel)}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          animate={{ 
+            rotate: showToolPanel ? 45 : 0,
+            backgroundColor: showToolPanel ? agents[currentAgent].color : 'transparent'
+          }}
+        >
+          🛠️
+        </motion.button>
+        
+        <motion.button
+          className="nav-btn"
+          onClick={() => switchThread('bro')}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          style={{ 
+            color: currentAgent === 'bro' ? agents.bro.color : 'var(--text-secondary)'
+          }}
+        >
+          <img src={agents.bro.avatar} alt="Bro" className="nav-avatar" />
+        </motion.button>
+        
+        <motion.button
+          className="nav-btn"
+          onClick={() => switchThread('lilsis')}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          style={{ 
+            color: currentAgent === 'lilsis' ? agents.lilsis.color : 'var(--text-secondary)'
+          }}
+        >
+          <img src={agents.lilsis.avatar} alt="Lil Sis" className="nav-avatar" />
+        </motion.button>
+      </div>
+      
+      {/* Voice Control Button */}
+      <motion.button
+        className={`voice-btn ${isListening ? 'active' : ''}`}
+        onClick={isListening ? stopVoiceRecognition : startVoiceRecognition}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        style={{
+          backgroundColor: isListening ? agents[currentAgent].color : 'var(--bg-secondary)',
+          boxShadow: isListening ? `0 0 20px ${agents[currentAgent].glow}` : 'none'
+        }}
+      >
+        {isListening ? '🎤' : '🎙️'}
+      </motion.button>
+      
+      {/* Voice Transcript Display */}
+      {voiceTranscript && (
+        <motion.div 
+          className="voice-transcript glass-surface"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+        >
+          <span className="transcript-label">Listening:</span>
+          <span className="transcript-text">{voiceTranscript}</span>
+        </motion.div>
+      )}
+      
       {/* Input Area */}
       <div className="chat-input-wrapper">
         <EnhancedChatInput

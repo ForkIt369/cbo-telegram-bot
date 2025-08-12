@@ -1,0 +1,464 @@
+/* Mobile-First Enhancements from ZenSis Memory */
+
+/* Context Bar */
+.context-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  height: 32px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 12px;
+  overflow: hidden;
+}
+
+.thread-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+}
+
+.thread-label {
+  opacity: 0.6;
+}
+
+.thread-name {
+  color: var(--agent-primary);
+  font-weight: 600;
+}
+
+.thread-count {
+  opacity: 0.6;
+  margin-left: 8px;
+}
+
+.view-mode-toggle {
+  display: flex;
+  gap: 4px;
+}
+
+.view-mode-toggle button {
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-mode-toggle button.active {
+  background: var(--agent-glow);
+  border-color: var(--agent-primary);
+  color: var(--text-primary);
+}
+
+/* Bottom Navigation Bar - Thumb Zone Optimized */
+.bottom-navigation {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: var(--bg-secondary);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 200;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+.nav-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  min-width: 44px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+  color: var(--text-secondary);
+}
+
+.nav-btn:active {
+  transform: scale(0.95);
+}
+
+.nav-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+.nav-btn:hover .nav-avatar,
+.nav-btn.active .nav-avatar {
+  opacity: 1;
+  box-shadow: 0 0 12px var(--agent-glow);
+}
+
+.tools-toggle {
+  font-size: 24px;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  background: var(--bg-tertiary);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.tools-toggle.active {
+  background: var(--agent-primary);
+  border-color: var(--agent-primary);
+}
+
+/* Adjust chat content for bottom nav */
+.chat-content {
+  padding-bottom: 56px;
+}
+
+/* Adjust input wrapper for bottom nav */
+.chat-input-wrapper {
+  padding: 12px;
+  background: var(--bg-secondary);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  margin-bottom: 56px;
+}
+
+/* Skeleton Loading States */
+.skeleton-message {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.skeleton-content {
+  flex: 1;
+}
+
+.skeleton-line {
+  height: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.skeleton-line:last-child {
+  width: 60%;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Swipe Gesture Indicators */
+.swipe-indicator {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 32px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  color: var(--agent-primary);
+}
+
+.swipe-indicator.left {
+  left: 16px;
+}
+
+.swipe-indicator.right {
+  right: 16px;
+}
+
+.chat-content.dragging .swipe-indicator {
+  opacity: 0.3;
+}
+
+/* Touch optimizations */
+.chat-content {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Virtual Scrolling Container */
+.virtual-scroll-container {
+  position: relative;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.virtual-scroll-spacer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  pointer-events: none;
+}
+
+.virtual-scroll-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+/* Offline Mode Indicator */
+.offline-mode-banner {
+  position: fixed;
+  top: 56px;
+  left: 0;
+  right: 0;
+  background: var(--state-warning);
+  color: var(--bg-primary);
+  padding: 8px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 201;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Smart Folders for Thread Organization */
+.thread-folders {
+  display: flex;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.folder-chip {
+  padding: 6px 12px;
+  background: var(--bg-tertiary);
+  border-radius: 16px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.folder-chip.active {
+  background: var(--agent-glow);
+  border-color: var(--agent-primary);
+  color: var(--text-primary);
+}
+
+/* Voice Input Button */
+.voice-input-btn {
+  position: absolute;
+  right: 60px;
+  bottom: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.voice-input-btn.recording {
+  background: var(--state-error);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 69, 58, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 69, 58, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 69, 58, 0);
+  }
+}
+
+/* Haptic Feedback Visual Cues */
+.haptic-feedback {
+  position: absolute;
+  pointer-events: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--agent-primary) 0%, transparent 70%);
+  opacity: 0;
+  transform: scale(0);
+  animation: haptic-ripple 0.6s ease-out;
+}
+
+@keyframes haptic-ripple {
+  0% {
+    opacity: 0.6;
+    transform: scale(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3);
+  }
+}
+
+/* Performance: GPU Acceleration */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* Accessibility: High Contrast Mode */
+@media (prefers-contrast: high) {
+  .bottom-navigation {
+    border-top: 2px solid var(--text-primary);
+  }
+  
+  .nav-btn {
+    border: 1px solid var(--text-secondary);
+  }
+  
+  .context-bar {
+    border-bottom: 2px solid var(--text-primary);
+  }
+}
+
+/* Accessibility: Voice Control Labels */
+.voice-control-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Mobile Specific Breakpoint */
+@media (max-width: 430px) {
+  .chat-header {
+    padding: 8px 12px;
+  }
+  
+  .bottom-navigation {
+    height: 48px;
+  }
+  
+  .nav-btn {
+    height: 40px;
+    min-width: 40px;
+  }
+  
+  .nav-avatar {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .tools-toggle {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+}
+
+/* Tablet Support */
+@media (min-width: 431px) and (max-width: 768px) {
+  .bottom-navigation {
+    max-width: 600px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 24px 24px 0 0;
+  }
+  
+  .chat-content {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+/* Two-Step Deletion Pattern */
+.message-swipe-actions {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  background: var(--state-error);
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.message-swipe-actions.visible {
+  transform: translateX(0);
+}
+
+.delete-btn {
+  padding: 8px 16px;
+  background: white;
+  color: var(--state-error);
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.undo-toast {
+  position: fixed;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-tertiary);
+  padding: 12px 24px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: var(--shadow-xl);
+  animation: slideUp 0.3s ease;
+}
+
+.undo-btn {
+  color: var(--agent-primary);
+  font-weight: 600;
+  cursor: pointer;
+}
