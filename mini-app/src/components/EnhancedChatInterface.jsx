@@ -470,8 +470,8 @@ const EnhancedChatInterface = ({ userId }) => {
     <div className="enhanced-chat-interface">
       {/* Header with Agent Selector */}
       <header className="chat-header glass-surface" style={{
-        borderBottom: `2px solid ${agents[currentAgent].color}`,
-        background: `linear-gradient(135deg, ${agents[currentAgent].glow} 0%, transparent 60%)`
+        borderBottom: `1px solid ${agents[currentAgent].color}30`,
+        background: `linear-gradient(135deg, ${agents[currentAgent].glow}20 0%, transparent 60%)`
       }}>
         <div className="header-left">
           <div className="agent-selector-container">
@@ -539,15 +539,16 @@ const EnhancedChatInterface = ({ userId }) => {
             </AnimatePresence>
           </div>
           
-          <div className="header-info">
-            <h1 className="header-title">BroVerse Optimizer</h1>
-            <div className="header-subtitle">
-              {agents[currentAgent].personality}
-              {connectionStatus === 'offline' && (
-                <span className="offline-badge">Offline Mode</span>
-              )}
-            </div>
-          </div>
+          <img 
+            src="/broverse-logo.svg" 
+            alt="BroVerse" 
+            className="header-logo"
+            style={{ 
+              height: '28px',
+              marginLeft: '12px',
+              filter: `drop-shadow(0 0 8px ${agents[currentAgent].glow})`
+            }}
+          />
         </div>
         
         <FlowIndicator activeFlow={activeFlow} />
@@ -797,12 +798,12 @@ const EnhancedChatInterface = ({ userId }) => {
         </motion.div>
       )}
       
-      {/* Input Area */}
-      <div className="chat-input-wrapper">
+      {/* Input Area - Compact */}
+      <div className="chat-input-wrapper compact">
         <EnhancedChatInput
           onSendMessage={handleSendMessage}
           isLoading={isLoading}
-          placeholder={showWelcome ? `Ask ${agents[currentAgent].name} to analyze your business...` : `Message ${agents[currentAgent].name}...`}
+          placeholder={`Ask ${agents[currentAgent].name}...`}
           onTyping={handleUserTyping}
           currentAgent={agents[currentAgent]}
         />

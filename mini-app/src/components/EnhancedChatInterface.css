@@ -278,7 +278,8 @@
   flex: 1;
   overflow-y: auto;
   position: relative;
-  padding: var(--space-3);
+  padding: 12px;
+  padding-bottom: 140px; /* Space for input + bottom nav */
 }
 
 .messages-wrapper {
